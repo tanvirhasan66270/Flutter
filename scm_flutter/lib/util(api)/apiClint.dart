@@ -1,6 +1,4 @@
 
-
-
 import 'package:dio/dio.dart';
 import 'package:scm_flutter/service/storageService.dart';
 import 'package:scm_flutter/util(api)/apiConstants.dart';
@@ -34,6 +32,9 @@ ApiClient(this._storageService) {
 }
 
 
+}
+
+
 /// Normalizes Dio/backend errors into a readable message, similar to how
 /// the Angular login component branched on `err.status`.
 String apiErrorMessage(Object error) {
@@ -61,5 +62,4 @@ String apiErrorMessage(Object error) {
     }
   }
   return 'Something went wrong. Please try again.';
-}
 }
