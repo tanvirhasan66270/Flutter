@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/entity/forgotPassword.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
-import 'package:scm_flutter/util(api)/apiClint.dart';
+import 'package:scm_flutter/util/apiClint.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {

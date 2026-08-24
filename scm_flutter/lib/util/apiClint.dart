@@ -1,7 +1,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:scm_flutter/service/storageService.dart';
-import 'package:scm_flutter/util(api)/apiConstants.dart';
+import 'package:scm_flutter/util/apiConstants.dart';
 
 class ApiClient {
 

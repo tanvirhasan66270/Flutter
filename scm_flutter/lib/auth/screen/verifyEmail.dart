@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
-import 'package:scm_flutter/util(api)/apiClint.dart';
+import 'package:scm_flutter/util/apiClint.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
 

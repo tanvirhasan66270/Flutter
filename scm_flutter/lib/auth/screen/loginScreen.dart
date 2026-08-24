@@ -27,7 +27,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _passwordCtrl.dispose();
     super.dispose();
   }
-
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -40,12 +39,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref
           .read(authControllerProvider.notifier)
           .login(_emailCtrl.text.trim(), _passwordCtrl.text);
+
       if (!mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     } catch (e) {
+      if (!mounted) return; // এখানে চেক করা হয়েছে
       setState(() => _errorMessage = apiErrorMessage(e));
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false); // এখানেও mounted চেক করা হয়েছে
+      }
     }
   }
 
