@@ -1,7 +1,6 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/framework.dart';
 import 'package:scm_flutter/auth/authRepository.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
 import 'package:scm_flutter/entity/loginModel.dart';

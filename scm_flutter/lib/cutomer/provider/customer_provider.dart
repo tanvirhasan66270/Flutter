@@ -5,14 +5,13 @@ import 'package:scm_flutter/cutomer/data/customerOrder_Repository.dart';
 import 'package:scm_flutter/cutomer/data/customer_repository.dart';
 import 'package:scm_flutter/entity/customerModel.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
-// আপনার কাস্টমার অর্ডার রেপজিটরি ইম্পোর্ট করুন
-// import 'package:scm_flutter/cutomer/data/customer_order_repository.dart';
 
+
+// import 'package:scm_flutter/cutomer/data/customer_order_repository.dart';
 final customerRepositoryProvider = Provider<CustomerRepository>((ref) {
   return CustomerRepository(ref.watch(apiClientProvider));
 });
 
-// সঠিক কাস্টমার অর্ডার রেপজিটরি প্রোভাইডার
 final customerOrderRepositoryProvider = Provider<CustomerOrderRepository>((ref) {
   return CustomerOrderRepository(ref.watch(apiClientProvider));
 });

@@ -74,6 +74,12 @@ class ApiConstants {
       'policeStation/search?keyword=$keyword';
 
 
+  // Category Endpoints ( @RequestMapping("/api/category") )
+  static const String categories = 'category';
+  static String categoryById(int id) => 'category/$id';
+  static const String publicCategories = 'category/public';
+
+
 
 // ── Customer Orders ────────────────────────────────────
   static const String customerOrders = 'customerOrders';
@@ -126,14 +132,12 @@ class ApiConstants {
 
 // ── Purchase Order Line Items ──────────────────────────
   static const String poLineItems = 'po-line-items';
-
   static String poLineItemById(int id) => 'po-line-items/$id';
   static String trackPoLineItem(String trackingNumber) => 'po-line-items/track/$trackingNumber';
 
 
   // ── Goods Received Notes (GRN) ─────────────────────────
   static const String goodsReceivedNotes = 'goods-received-notes';
-
   static String goodsReceivedNoteById(int id) => 'goods-received-notes/$id';
 
 
@@ -183,8 +187,19 @@ class ApiConstants {
 
   // ── Vehicles ───────────────────────────────────────────
   static const String vehicles = 'vehicles';
-
   static String vehicleById(int id) => 'vehicles/$id';
 
+///Massage
+  static const String messages = '/api/messages';
+  static const String messageInbox = '/api/messages/inbox';
+  static const String messageChatlist = '/api/messages/chatlist';
+  static const String messageHistory = '/api/messages/history';
+  static String messageRead(int id) => '/api/messages/$id/read';
+
+  ///Notification
+  static const String notifications = '/api/notifications';
+  static const String notificationUnreadCount = '/api/notifications/unread-count';
+  static const String notificationReadAll = '/api/notifications/read-all';
+  static String notificationRead(int id) => '/api/notifications/$id/read';
 
 }

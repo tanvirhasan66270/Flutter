@@ -17,7 +17,7 @@ class CustomerOrderRepository {
         jsonEncode(dto.toJson()),
         contentType: DioMediaType('application', 'json'),
       ),
-      if (imageFile != null) 'image': imageFile,
+      'image': ?imageFile,
     });
 
     final res = await _dio.post(ApiConstants.createCustomerOrder, data: formData);
@@ -31,7 +31,7 @@ class CustomerOrderRepository {
         jsonEncode(dto.toJson()),
         contentType: DioMediaType('application', 'json'),
       ),
-      if (imageFile != null) 'image': imageFile,
+      'image': ?imageFile,
     });
 
     final res = await _dio.put(ApiConstants.customerOrderById(id), data: formData);

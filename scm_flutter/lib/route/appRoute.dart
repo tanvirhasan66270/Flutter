@@ -4,14 +4,23 @@ import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/auth/screen/forgetPasswordScreen.dart';
 import 'package:scm_flutter/auth/screen/loginScreen.dart';
 import 'package:scm_flutter/auth/screen/verifyEmail.dart';
+import 'package:scm_flutter/auth/system/massage/chat_workspace_screen.dart';
+import 'package:scm_flutter/cutomer/screen/add_payment_screen.dart';
+import 'package:scm_flutter/cutomer/screen/billing_ledger_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customerDashboardScreen.dart';
+import 'package:scm_flutter/cutomer/screen/customer_order_screen.dart';
+import 'package:scm_flutter/cutomer/screen/customer_oredr_track_page.dart';
+import 'package:scm_flutter/cutomer/screen/customer_profile_screen.dart';
+import 'package:scm_flutter/invoice/invoice_portal_screen.dart';
+import 'package:scm_flutter/product/screen/product_screen.dart';
+import 'package:scm_flutter/auth/system/notification/notification_screen.dart';
 
 
 /// Mirrors app.routes.ts + guards/auth-guard.ts + role-redirect component.
 ///
 /// This app currently implements the CUSTOMER role end-to-end (matching the
 /// "Auth + Customer module first" scope). AGENT/ADMIN/RIDER dashboards can
-/// be added the same way: new screens under features/<role>/screens, and a
+/// be added the same way: new screens under `features/<role>/screens`, and a
 /// branch in [RoleRedirectScreen].
 class AppRouter {
 AppRouter._();
@@ -52,12 +61,69 @@ builder: (_) => VerifyEmailScreen(token: token),
 settings: settings,
 );
 
-
+  case '/products':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: ProductScreen()),
+      settings: settings,
+    );
 
 // ── Customer (auth-guarded) ─────────────────────────
   case '/dashboard':
     return MaterialPageRoute(
       builder: (_) => const _RequireAuth(child: CustomerDashboardScreen()),
+      settings: settings,
+    );
+
+  case '/customer-order':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: CustomerOrderScreen()),
+      settings: settings,
+    );
+
+  case '/customer-order-track':
+    final orderNo = settings.arguments as String?;
+    return MaterialPageRoute(
+      builder: (_) => _RequireAuth(child: CustomerOrderTrackScreen(initialOrderNumber: orderNo)),
+      settings: settings,
+    );
+
+  case '/add-payment':
+    final orderNo = settings.arguments as String?;
+    return MaterialPageRoute(
+      builder: (_) => _RequireAuth(child: AddPaymentScreen(initialOrderNumber: orderNo)),
+      settings: settings,
+    );
+
+  case '/billing-ledger':
+    final orderNo = settings.arguments as String?;
+    return MaterialPageRoute(
+      builder: (_) => _RequireAuth(child: BillingLedgerScreen(initialOrderNumber: orderNo)),
+      settings: settings,
+    );
+
+  case '/invoice-portal':
+    final orderNo = settings.arguments as String?;
+    return MaterialPageRoute(
+      builder: (_) => _RequireAuth(child: InvoicePortalScreen(initialOrderNumber: orderNo)),
+      settings: settings,
+    );
+
+  case '/messages':
+  case '/support':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: ChatWorkspaceScreen()),
+      settings: settings,
+    );
+
+  case '/profile':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: CustomerProfileScreen()),
+      settings: settings,
+    );
+
+  case '/notifications':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: NotificationScreen()),
       settings: settings,
     );
 
