@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
-export 'package:scm_flutter/util(api)/apiClint.dart' ;
 
 /// Mirrors the `<button [disabled]="loading"><spinner/></button>` pattern
 /// used across nearly every Angular form (login, register, book parcel...).
