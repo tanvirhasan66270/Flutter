@@ -4,6 +4,7 @@ import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/auth/screen/forgetPasswordScreen.dart';
 import 'package:scm_flutter/auth/screen/loginScreen.dart';
 import 'package:scm_flutter/auth/screen/verifyEmail.dart';
+import 'package:scm_flutter/cutomer/screen/customerDashboardScreen.dart';
 
 
 /// Mirrors app.routes.ts + guards/auth-guard.ts + role-redirect component.
@@ -51,12 +52,23 @@ builder: (_) => VerifyEmailScreen(token: token),
 settings: settings,
 );
 
+
+
+// ── Customer (auth-guarded) ─────────────────────────
+  case '/dashboard':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: CustomerDashboardScreen()),
+      settings: settings,
+    );
+
   case '/':
   default:
     return MaterialPageRoute(
       builder: (_) => const RoleRedirectScreen(),
       settings: settings,
     );
+
+
 }
 }
 }
@@ -77,10 +89,11 @@ class RoleRedirectScreen extends ConsumerWidget {
       data: (user) {
         if (user == null) return const LoginScreen();
 
-        switch (user.role) {
+
+        switch (user.role.toUpperCase()) {
+
           case 'CUSTOMER':
-            // return const CustomerDashboardScreen();
-            return const Scaffold(body: Center(child: Text('Customer Dashboard (Not Implemented)')));
+            return const CustomerDashboardScreen();
           case 'ADMIN':
           case 'MANAGER':
           case 'PROCUREMENT':

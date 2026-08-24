@@ -4,7 +4,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:scm_flutter/service/storageService.dart';
-import 'package:scm_flutter/util(api)/apiClint.dart';
+import 'package:scm_flutter/util/apiClint.dart';
 
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage();

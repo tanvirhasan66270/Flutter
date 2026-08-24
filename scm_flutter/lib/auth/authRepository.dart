@@ -6,8 +6,8 @@ import 'package:scm_flutter/entity/forgotPassword.dart';
 import 'package:scm_flutter/entity/loginModel.dart';
 import 'package:scm_flutter/entity/resetPassword.dart';
 import 'package:scm_flutter/service/storageService.dart';
-import 'package:scm_flutter/util(api)/apiClint.dart';
-import 'package:scm_flutter/util(api)/apiConstants.dart';
+import 'package:scm_flutter/util/apiClint.dart';
+import 'package:scm_flutter/util/apiConstants.dart';
 
 class AuthRepository {
 
