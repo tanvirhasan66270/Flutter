@@ -190,16 +190,16 @@ class ApiConstants {
   static String vehicleById(int id) => 'vehicles/$id';
 
 ///Massage
-  static const String messages = '/api/messages';
-  static const String messageInbox = '/api/messages/inbox';
-  static const String messageChatlist = '/api/messages/chatlist';
-  static const String messageHistory = '/api/messages/history';
-  static String messageRead(int id) => '/api/messages/$id/read';
+  static const String messages = 'messages';
+  static const String messageInbox = 'messages/inbox';
+  static const String messageChatlist = 'messages/chatlist';
+  static const String messageHistory = 'messages/history';
+  static String messageRead(int id) => 'messages/$id/read';
 
   ///Notification
-  static const String notifications = '/api/notifications';
-  static const String notificationUnreadCount = '/api/notifications/unread-count';
-  static const String notificationReadAll = '/api/notifications/read-all';
-  static String notificationRead(int id) => '/api/notifications/$id/read';
+  static const String notifications = 'notifications';
+  static const String notificationUnreadCount = 'notifications/unread-count';
+  static const String notificationReadAll = 'notifications/read-all';
+  static String notificationRead(int id) => 'notifications/$id/read';
 
 }

@@ -5,6 +5,7 @@ import 'package:scm_flutter/cutomer/provider/payment_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/payment_statement_model.dart';
 import 'package:scm_flutter/util/apiClint.dart';
+import 'package:scm_flutter/util/pdf_statement_generator.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
 
 class BillingLedgerScreen extends ConsumerStatefulWidget {
@@ -18,6 +19,7 @@ class BillingLedgerScreen extends ConsumerStatefulWidget {
 class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
   final _searchController = TextEditingController();
   String? _searchedCode;
+  bool _isGeneratingPdf = false;
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
     final paymentsAsync = (_searchedCode != null) ? ref.watch(orderPaymentsProvider(_searchedCode!)) : null;
     final orderAsync = (_searchedCode != null) ? ref.watch(trackCustomerOrderProvider(_searchedCode!)) : null;
 
+    final currentPayments = paymentsAsync?.value ?? [];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -46,6 +50,17 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: const BackButton(color: Colors.black87),
+        actions: [
+          if (orderAsync != null && orderAsync.hasValue)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: IconButton(
+                tooltip: 'Download PDF Statement',
+                icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF1E40AF)),
+                onPressed: _isGeneratingPdf ? null : () => _downloadPdf(orderAsync.value!, currentPayments),
+              ),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -56,7 +71,7 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
             if (_searchedCode == null) _buildEmptyState('Search for an order to view history')
             else ...[
                if (orderAsync != null) orderAsync.when(
-                 data: (order) => _buildFinancialCard(order),
+                 data: (order) => _buildFinancialCard(order, currentPayments),
                  loading: () => const LinearProgressIndicator(),
                  error: (e, _) => ErrorBanner(message: apiErrorMessage(e)),
                ),
@@ -113,17 +128,53 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
     );
   }
 
-  Widget _buildFinancialCard(CustomerOrderResponse order) {
+  Future<void> _downloadPdf(CustomerOrderResponse order, List<PaymentStatementResponse> payments) async {
+    setState(() => _isGeneratingPdf = true);
+    try {
+      await PdfStatementGenerator.downloadOrPrint(order: order, payments: payments);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isGeneratingPdf = false);
+    }
+  }
+
+  Widget _buildFinancialCard(CustomerOrderResponse order, List<PaymentStatementResponse> payments) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Financial Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              StatusBadge(status: order.paymentStatus),
-            ]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Financial Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Row(
+                  children: [
+                    StatusBadge(status: order.paymentStatus),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: _isGeneratingPdf ? null : () => _downloadPdf(order, payments),
+                      icon: _isGeneratingPdf
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(Icons.picture_as_pdf, size: 16),
+                      label: const Text('PDF Download', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E40AF),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             Row(children: [
               _statItem('Grand Total', '৳${order.totalAmount}', Colors.blue),

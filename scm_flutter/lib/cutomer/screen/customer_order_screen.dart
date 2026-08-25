@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,7 +8,9 @@ import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/productModel.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
+import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
+import 'dart:io';
 
 class CustomerOrderItemEntry {
   CustomerOrderItemEntry({
@@ -22,10 +24,10 @@ class CustomerOrderItemEntry {
   String remarks;
 
   OrderLineItemRequest toRequest() => OrderLineItemRequest(
-        productId: product.id,
-        quantity: quantity,
-        remarks: remarks,
-      );
+    productId: product.id,
+    quantity: quantity,
+    remarks: remarks,
+  );
 }
 
 class CustomerOrderScreen extends ConsumerStatefulWidget {
@@ -285,7 +287,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
 
     try {
       final repo = ref.read(customerOrderRepositoryProvider);
-      
+
       MultipartFile? imageFile;
       if (_paymentProofImage != null) {
         imageFile = await MultipartFile.fromFile(_paymentProofImage!.path, filename: _paymentProofImage!.name);
@@ -381,11 +383,9 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                File(_paymentProofImage!.path),
-                height: 180,
-                fit: BoxFit.contain,
-              ),
+              child: kIsWeb
+                  ? Image.network(_paymentProofImage!.path, height: 180, fit: BoxFit.contain)
+                  : Image.file(File(_paymentProofImage!.path), height: 180, fit: BoxFit.contain),
             ),
           ),
         ],
@@ -406,121 +406,94 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Top Navigation Bar (Matching Image Header) ──
+            // ── Top Navigation Bar ──
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
               ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.black87),
-                    onPressed: () {},
-                  ),
-                  const SizedBox(width: 4),
-                  // SCM PRO Logo with Globe & Truck Badge
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.local_shipping_rounded, color: Color(0xFF2563EB), size: 22),
-                      ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: const [
-                              Text('SCM ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0B2545))),
-                              Text('PRO', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF2563EB))),
-                            ],
-                          ),
-                          const Text('Supply Chain Management', style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-
-                  // Clock Display Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Row(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Row(
                       children: [
-                        const Icon(Icons.access_time_rounded, size: 14, color: Colors.grey),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}',
-                          style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.local_shipping_rounded, color: Color(0xFF2563EB), size: 22),
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Text('SCM ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0B2545))),
+                                Text('PRO', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF2563EB))),
+                              ],
+                            ),
+                            const Text('Supply Chain Management', style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
+                          ],
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  // Notification Bell Icon
-                  Stack(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined, color: Colors.black87, size: 22),
-                        onPressed: () => Navigator.pushNamed(context, '/notifications'),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.grey.shade300),
                       ),
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Chat Workspace Icon
-                  IconButton(
-                    icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.black87, size: 20),
-                    onPressed: () => Navigator.pushNamed(context, '/messages'),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // User Profile Avatar & Name
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: const Color(0xFF4F46E5),
-                        radius: 16,
-                        child: Text(
-                          _loggedInCustomerName.isNotEmpty ? _loggedInCustomerName[0].toUpperCase() : 'J',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text(_loggedInCustomerName.isNotEmpty ? _loggedInCustomerName : 'johan', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
-                          Text(_userRole.isNotEmpty ? _userRole : 'CUSTOMER', style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
+                          const Icon(Icons.access_time_rounded, size: 14, color: Colors.grey),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}',
+                            style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(width: 12),
+                    const DynamicNotificationButton(),
+                    IconButton(
+                      icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.black87, size: 20),
+                      onPressed: () => Navigator.pushNamed(context, '/messages'),
+                    ),
+                    const SizedBox(width: 8),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: const Color(0xFF4F46E5),
+                          radius: 16,
+                          child: Text(
+                            _loggedInCustomerName.isNotEmpty ? _loggedInCustomerName[0].toUpperCase() : 'J',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_loggedInCustomerName.isNotEmpty ? _loggedInCustomerName : 'johan', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
+                            Text(_userRole.isNotEmpty ? _userRole : 'CUSTOMER', style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            // ── Scrollable Form Area (Matching exact image sections) ──
+            // ── Scrollable Form Area ──
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -529,11 +502,14 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Sub-Header Bar: Title + Back Button
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: const [
                               Icon(Icons.shopping_cart, color: Color(0xFF2563EB), size: 22),
                               SizedBox(width: 8),
@@ -634,7 +610,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // ── Section 2: ESTIMATED DELIVERY ROADMAP & DELIVERY PHONE CHANNEL ──
+                      // ── Section 2: ESTIMATED DELIVERY ROADMAP & PHONE ──
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -646,7 +622,8 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   DropdownButtonFormField<String>(
-                                    initialValue: _selectedEstimatedDelivery,
+                                    value: _selectedEstimatedDelivery,
+                                    isExpanded: true,
                                     decoration: _inputDecoration(),
                                     items: const [
                                       DropdownMenuItem(value: 'Auto-Fixed by Priority Rule', child: Text('Auto-Fixed by Priority Rule', style: TextStyle(fontSize: 12))),
@@ -662,9 +639,12 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                     children: [
                                       const Icon(Icons.calendar_today_outlined, size: 14, color: Color(0xFF16A34A)),
                                       const SizedBox(width: 6),
-                                      Text(
-                                        _getEstimatedDeliveryByPriority(_selectedPriority),
-                                        style: const TextStyle(fontSize: 11, color: Color(0xFF16A34A), fontWeight: FontWeight.bold),
+                                      Expanded(
+                                        child: Text(
+                                          _getEstimatedDeliveryByPriority(_selectedPriority),
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 11, color: Color(0xFF16A34A), fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -716,7 +696,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // ── Section 4: SERVICE STRATEGY MATRIX & ORDER PRIORITY MATRIX ──
+                      // ── Section 4: SERVICE & PRIORITY MATRIX ──
                       Row(
                         children: [
                           Expanded(
@@ -724,7 +704,8 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                               icon: Icons.assignment_turned_in_outlined,
                               title: 'SERVICE STRATEGY MATRIX',
                               child: DropdownButtonFormField<String>(
-                                initialValue: _selectedServiceType,
+                                value: _selectedServiceType,
+                                isExpanded: true,
                                 decoration: _inputDecoration(),
                                 items: const [
                                   DropdownMenuItem(value: ServiceType.standard, child: Text('STANDARD Logistics Delivery', style: TextStyle(fontSize: 12))),
@@ -744,7 +725,8 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                               icon: Icons.flag_outlined,
                               title: 'ORDER PRIORITY MATRIX',
                               child: DropdownButtonFormField<String>(
-                                initialValue: _selectedPriority,
+                                value: _selectedPriority,
+                                isExpanded: true,
                                 decoration: _inputDecoration(),
                                 items: const [
                                   DropdownMenuItem(value: Priority.low, child: Text('LOW Priority (120 Days / 1% Disc.)', style: TextStyle(fontSize: 12))),
@@ -770,7 +752,8 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             DropdownButtonFormField<String>(
-                              initialValue: _selectedPaymentMethod,
+                              value: _selectedPaymentMethod,
+                              isExpanded: true,
                               decoration: _inputDecoration(),
                               items: const [
                                 DropdownMenuItem(value: PaymentMethod.cash, child: Text('CASH On Delivery', style: TextStyle(fontSize: 12))),
@@ -783,8 +766,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                 if (val != null) setState(() => _selectedPaymentMethod = val);
                               },
                             ),
-
-                            // Bank Gateway Information Card
                             if (_selectedPaymentMethod == PaymentMethod.bank) ...[
                               const SizedBox(height: 12),
                               Container(
@@ -826,19 +807,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                           SizedBox(height: 4),
                                           Text('Bank Name: City Bank PLC (Corporate Branch)', style: TextStyle(fontSize: 11, fontFamily: 'monospace')),
                                           Text('Company A/C: 120-3341-98234101', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2563EB), fontFamily: 'monospace')),
-                                          SizedBox(height: 6),
-                                          Row(
-                                            children: [
-                                              Icon(Icons.warning_amber_rounded, size: 13, color: Colors.red),
-                                              SizedBox(width: 4),
-                                              Expanded(
-                                                child: Text(
-                                                  'Note: Payment must be completed within 7 days, otherwise the order will be cancelled.',
-                                                  style: TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -856,8 +824,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                 ),
                               ),
                             ],
-
-                            // MFS Mobile Wallet Verification Card
                             if (['BKASH', 'NAGAD', 'ROCKET'].contains(_selectedPaymentMethod)) ...[
                               const SizedBox(height: 12),
                               Container(
@@ -898,19 +864,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text('$_selectedPaymentMethod Merchant/Personal: 01712-345678', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFDC2626), fontFamily: 'monospace')),
-                                          const SizedBox(height: 6),
-                                          const Row(
-                                            children: [
-                                              Icon(Icons.warning_amber_rounded, size: 13, color: Colors.red),
-                                              SizedBox(width: 4),
-                                              Expanded(
-                                                child: Text(
-                                                  'Note: Payment must be completed within 7 days, otherwise the order will be cancelled.',
-                                                  style: TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.bold),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -933,7 +886,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // ── Section 6: INITIAL PAYMENT CONTEXT & SPECIAL REMARKS ──
+                      // ── Section 6: INITIAL PAYMENT CONTEXT & REMARKS ──
                       Row(
                         children: [
                           Expanded(
@@ -981,7 +934,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Product allocation input form row
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
@@ -993,7 +945,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                       const Text('INVENTORY PRODUCT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
                                       const SizedBox(height: 4),
                                       DropdownButtonFormField<ProductResponseModel>(
-                                        initialValue: _selectedProduct,
+                                        value: _selectedProduct,
                                         isExpanded: true,
                                         decoration: _inputDecoration(hint: 'Search product...'),
                                         items: _products.map((p) {
@@ -1071,8 +1023,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
-
-                            // Attached products table header & items
                             Text('ATTACHED PRODUCTS LIST (${_allocatedItems.length})', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
                             const SizedBox(height: 8),
 
@@ -1097,7 +1047,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                           Expanded(flex: 3, child: Text('PRODUCT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
                                           Expanded(flex: 2, child: Text('QTY', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
                                           Expanded(flex: 3, child: Text('NOTES', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
-                                          Expanded(child: Text('ACTION', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
+                                          SizedBox(width: 70, child: Text('ACTION', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
                                         ],
                                       ),
                                     ),
@@ -1135,8 +1085,8 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                                       child: Column(
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
-                                                          Text(entry.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                                          Text('SKU: ${entry.product.productCode}', style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                                                          Text(entry.product.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                                          Text('SKU: ${entry.product.productCode}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey, fontSize: 10)),
                                                         ],
                                                       ),
                                                     ),
@@ -1163,15 +1113,15 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                                               }
                                                             });
                                                           },
-                                                          child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('-', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+                                                          child: const Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4), child: Text('-', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
                                                         ),
                                                         Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 6),
                                                           child: Text('${entry.quantity}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                                         ),
                                                         InkWell(
                                                           onTap: () => setState(() => entry.quantity++),
-                                                          child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: Text('+', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+                                                          child: const Padding(padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4), child: Text('+', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
                                                         ),
                                                       ],
                                                     ),
@@ -1187,23 +1137,25 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                                   decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade200), borderRadius: BorderRadius.circular(6)),
                                                   child: Text(
                                                     entry.remarks.isNotEmpty ? entry.remarks : 'Standard allocation notes',
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
                                                     style: const TextStyle(fontSize: 11, color: Colors.black87),
                                                   ),
                                                 ),
                                               ),
 
-                                              // Remove Button
-                                              Expanded(
+                                              // Remove Button with fixed width to avoid overflow
+                                              SizedBox(
+                                                width: 70,
                                                 child: Center(
-                                                  child: OutlinedButton.icon(
+                                                  child: OutlinedButton(
                                                     style: OutlinedButton.styleFrom(
                                                       foregroundColor: const Color(0xFFEF4444),
                                                       side: const BorderSide(color: Color(0xFFFCA5A5)),
-                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                                                     ),
                                                     onPressed: () => setState(() => _allocatedItems.removeAt(index)),
-                                                    icon: const Icon(Icons.delete_outline, size: 14),
-                                                    label: const Text('Remove', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                                    child: const Text('Remove', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
                                                   ),
                                                 ),
                                               ),
@@ -1258,7 +1210,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // ── Section 9: Bottom Action Buttons ──
+                      // ── Section 9: Action Buttons ──
                       Row(
                         children: [
                           Expanded(
@@ -1292,8 +1244,6 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                         ],
                       ),
                       const SizedBox(height: 24),
-
-                      // Footer
                       const Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1335,14 +1285,23 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(icon, size: 16, color: const Color(0xFF2563EB)),
-                  const SizedBox(width: 6),
-                  Text(title, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(icon, size: 16, color: const Color(0xFF2563EB)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        title,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              ?headerAction,
+              if (headerAction != null) headerAction,
             ],
           ),
           const SizedBox(height: 10),

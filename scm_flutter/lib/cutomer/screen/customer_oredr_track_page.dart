@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
+import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 
 class CustomerOrderTrackScreen extends ConsumerStatefulWidget {
   const CustomerOrderTrackScreen({super.key, this.initialOrderNumber});
@@ -62,23 +63,7 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
           ],
         ),
         actions: [
-          IconButton(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_outlined, color: Colors.black87),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                    child: const Text('3', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-            onPressed: () {},
-          ),
+          const DynamicNotificationButton(),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: CircleAvatar(
@@ -180,6 +165,16 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
   }
 
   Widget _buildTrackingResult(CustomerOrderResponse order) {
+    // স্ট্যাটাসগুলোকে বড় হাতের অক্ষরে রূপান্তর করে নিশ্চিত করা
+    final status = order.status.toUpperCase();
+
+    // প্রতিটি স্টেপের সঠিক কমপ্লিশন লজিক
+    final bool isPendingDone = true;
+    final bool isConfirmedDone = status == 'CONFIRMED' || status == 'PROCESSING' || status == 'SHIPPED' || status == 'DELIVERED';
+    final bool isProcessingDone = status == 'PROCESSING' || status == 'SHIPPED' || status == 'DELIVERED';
+    final bool isShippedDone = status == 'SHIPPED' || status == 'DELIVERED';
+    final bool isDeliveredDone = status == 'DELIVERED';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -278,7 +273,6 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                 ],
               ),
               const Divider(height: 24),
-              // Sub Info Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -308,11 +302,11 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _milestoneStep('Pending', Icons.access_time, true),
-              _milestoneStep('Confirmed', Icons.check, true),
-              _milestoneStep('Processing', Icons.settings, true),
-              _milestoneStep('Shipped', Icons.local_shipping, order.status != 'PENDING'),
-              _milestoneStep('Delivered', Icons.inventory, order.status == 'DELIVERED'),
+              _milestoneStep('Pending', Icons.access_time, isPendingDone),
+              _milestoneStep('Confirmed', Icons.check, isConfirmedDone),
+              _milestoneStep('Processing', Icons.settings, isProcessingDone),
+              _milestoneStep('Shipped', Icons.local_shipping, isShippedDone),
+              _milestoneStep('Delivered', Icons.inventory, isDeliveredDone),
             ],
           ),
         ),
@@ -344,7 +338,6 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
       ],
     );
   }
-
   Widget _subInfoColumn(IconData icon, String title, String subtitle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

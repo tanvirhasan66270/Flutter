@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
 import 'package:scm_flutter/entity/customerModel.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiClint.dart';
+import 'package:scm_flutter/util/apiConstants.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
 
 class CustomerProfileScreen extends ConsumerStatefulWidget {
@@ -14,6 +17,159 @@ class CustomerProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
+  final _picker = ImagePicker();
+  XFile? _selectedImage;
+  bool _isEditing = false;
+  bool _isUpdating = false;
+
+  String _resolveImageUrl(String? imgPath) {
+    if (imgPath == null || imgPath.trim().isEmpty) return '';
+    final trimmed = imgPath.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('/images/')) {
+      return '${ApiConstants.imgUrl}${trimmed.substring(8)}';
+    }
+    if (trimmed.startsWith('images/')) {
+      return '${ApiConstants.imgUrl}${trimmed.substring(7)}';
+    }
+    if (trimmed.startsWith('customer/') || trimmed.startsWith('user/')) {
+      return '${ApiConstants.imgUrl}$trimmed';
+    }
+    return '${ApiConstants.imgUrl}customer/$trimmed';
+  }
+
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+  late TextEditingController _addressController;
+  late TextEditingController _genderController;
+  late TextEditingController _dobController;
+  late TextEditingController _nidController;
+
+  int? _lastCustomerId;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _addressController = TextEditingController();
+    _genderController = TextEditingController();
+    _dobController = TextEditingController();
+    _nidController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _genderController.dispose();
+    _dobController.dispose();
+    _nidController.dispose();
+    super.dispose();
+  }
+
+  void _populateControllers(CustomerResponseModel customer) {
+    if (_lastCustomerId == customer.id && !_isEditing) return;
+    _lastCustomerId = customer.id;
+    _nameController.text = customer.name;
+    _emailController.text = customer.email;
+    _phoneController.text = customer.phone;
+    _addressController.text = customer.address;
+    _genderController.text = customer.gender;
+    _dobController.text = customer.dob;
+    _nidController.text = customer.nidNumber;
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      if (picked != null) {
+        setState(() {
+          _selectedImage = picked;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error picking image: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _selectDob() async {
+    final now = DateTime.now();
+    final initialDate = DateTime.tryParse(_dobController.text) ?? DateTime(1995, 1, 1);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1940),
+      lastDate: now,
+    );
+
+    if (picked != null) {
+      final formatted = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      setState(() {
+        _dobController.text = formatted;
+      });
+    }
+  }
+
+  Future<void> _updateProfile(CustomerResponseModel customer) async {
+    setState(() => _isUpdating = true);
+    final currentContext = context;
+
+    try {
+      final repo = ref.read(customerRepositoryProvider);
+      final request = CustomerRequestModel(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        address: _addressController.text.trim(),
+        gender: _genderController.text.trim().isEmpty ? customer.gender : _genderController.text.trim(),
+        dob: _dobController.text.trim(),
+        nidNumber: _nidController.text.trim(),
+        policeStationId: customer.policeStationId,
+      );
+
+      File? imageFile;
+      if (_selectedImage != null) {
+        imageFile = File(_selectedImage!.path);
+      }
+
+      await repo.update(customer.id, request, imageFile);
+
+      ref.invalidate(currentCustomerProvider);
+
+      if (mounted && currentContext.mounted) {
+        ScaffoldMessenger.of(currentContext).showSnackBar(
+          const SnackBar(
+            content: Text('Profile Registry Updated Successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        setState(() {
+          _isEditing = false;
+          _selectedImage = null;
+        });
+      }
+    } catch (e) {
+      if (mounted && currentContext.mounted) {
+        ScaffoldMessenger.of(currentContext).showSnackBar(
+          SnackBar(content: Text(apiErrorMessage(e)), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUpdating = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final customerAsync = ref.watch(currentCustomerProvider);
@@ -26,16 +182,28 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
         elevation: 0,
         leading: const BackButton(color: Colors.black87),
         actions: [
+          IconButton(
+            tooltip: 'Refresh Profile',
+            icon: const Icon(Icons.refresh, color: AppTheme.primary),
+            onPressed: () => ref.invalidate(currentCustomerProvider),
+          ),
           TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.edit_outlined, size: 18),
-            label: const Text('Edit'),
+            onPressed: () => setState(() => _isEditing = !_isEditing),
+            icon: Icon(_isEditing ? Icons.close : Icons.edit_outlined, size: 18),
+            label: Text(_isEditing ? 'Cancel' : 'Edit'),
             style: TextButton.styleFrom(foregroundColor: AppTheme.primary),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: customerAsync.when(
-        data: (customer) => customer == null ? const Center(child: Text('Customer not found')) : _buildProfileBody(customer),
+        data: (customer) {
+          if (customer == null) {
+            return const Center(child: Text('Customer profile not found.'));
+          }
+          _populateControllers(customer);
+          return _buildProfileBody(customer);
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: ErrorBanner(message: apiErrorMessage(e))),
       ),
@@ -43,63 +211,82 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
   }
 
   Widget _buildProfileBody(CustomerResponseModel customer) {
-    // Calculate completion percentage (mock logic)
+    // Dynamic Completion Calculation
     int completedFields = 0;
-    if (customer.name.isNotEmpty) completedFields++;
-    if (customer.email.isNotEmpty) completedFields++;
-    if (customer.phone.isNotEmpty) completedFields++;
-    if (customer.gender.isNotEmpty) completedFields++;
-    if (customer.dob.isNotEmpty) completedFields++;
-    if (customer.nidNumber.isNotEmpty) completedFields++;
-    if (customer.image.isNotEmpty) completedFields++;
-    final completion = (completedFields / 7 * 100).round();
+    final totalFields = 8;
+    if (_nameController.text.isNotEmpty) completedFields++;
+    if (_emailController.text.isNotEmpty) completedFields++;
+    if (_phoneController.text.isNotEmpty) completedFields++;
+    if (_genderController.text.isNotEmpty) completedFields++;
+    if (_dobController.text.isNotEmpty) completedFields++;
+    if (_nidController.text.isNotEmpty) completedFields++;
+    if (_addressController.text.isNotEmpty) completedFields++;
+    if (customer.image.isNotEmpty || _selectedImage != null) completedFields++;
+
+    final completion = (completedFields / totalFields * 100).round();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header Section ──────────────────────────
+          // ── Header Avatar Section ──────────────────
           _buildHeader(customer),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // ── Action Buttons ──────────────────────────
+          // ── Action Buttons for Avatar ─────────────
           Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: _pickImage,
                   icon: const Icon(Icons.image_outlined, size: 18),
-                  label: const Text('Choose New Image'),
+                  label: Text(_selectedImage == null ? 'Choose New Image' : 'Image Selected: ${_selectedImage!.name}'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: const BorderSide(color: Colors.grey),
+                    foregroundColor: _selectedImage != null ? AppTheme.primary : Colors.black87,
+                    side: BorderSide(color: _selectedImage != null ? AppTheme.primary : Colors.grey.shade400),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.cloud_upload_outlined),
-            label: const Text('UPLOAD NEW AVATAR'),
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 48),
-              backgroundColor: AppTheme.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          if (_selectedImage != null) ...[
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: _isUpdating ? null : () => _updateProfile(customer),
+              icon: _isUpdating
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.cloud_upload_outlined),
+              label: const Text('UPLOAD NEW AVATAR'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+                backgroundColor: AppTheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
-          ),
+          ],
           const SizedBox(height: 24),
 
           // ── Completion Section ──────────────────────
           _buildCompletionSection(completion),
           const SizedBox(height: 24),
 
-          // ── Edit Personal Settings ──────────────────
-          const Text('EDIT PERSONAL SETTINGS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+          // ── Personal Settings Form / List ──────────
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('PERSONAL REGISTRY DETAILS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+              if (!_isEditing)
+                InkWell(
+                  onTap: () => setState(() => _isEditing = true),
+                  child: const Text('Click to Edit', style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                ),
+            ],
+          ),
           const SizedBox(height: 12),
-          _buildSettingsList(customer),
+          _buildSettingsForm(customer),
           const SizedBox(height: 24),
 
           // ── Logistics & Location Metadata ───────────
@@ -107,8 +294,8 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           const SizedBox(height: 12),
           _buildLocationSection(customer),
           const SizedBox(height: 12),
-          
-          // Registered Date
+
+          // Registered Date Box
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -126,14 +313,17 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           ),
           const SizedBox(height: 24),
 
-          // ── Update Button ───────────────────────────
+          // ── Save/Update Button ──────────────────────
           ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.verified_user_outlined),
-            label: const Text('UPDATE PROFILE REGISTRY'),
+            onPressed: _isUpdating ? null : () => _updateProfile(customer),
+            icon: _isUpdating
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Icon(Icons.verified_user_outlined),
+            label: Text(_isUpdating ? 'UPDATING REGISTRY...' : 'UPDATE PROFILE REGISTRY'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 54),
               backgroundColor: AppTheme.primary,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
@@ -144,37 +334,56 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
   }
 
   Widget _buildHeader(CustomerResponseModel customer) {
+    ImageProvider? imageProvider;
+    if (_selectedImage != null) {
+      imageProvider = FileImage(File(_selectedImage!.path));
+    } else {
+      final resolvedUrl = _resolveImageUrl(customer.image);
+      if (resolvedUrl.isNotEmpty) {
+        imageProvider = NetworkImage(resolvedUrl);
+      }
+    }
+
     return Row(
       children: [
-        Stack(
-          children: [
-            CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.white,
-              backgroundImage: customer.image.isNotEmpty ? NetworkImage(customer.image) : null,
-              child: customer.image.isEmpty ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
-            ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(color: Color(0xFF0D6EFD), shape: BoxShape.circle),
-                child: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
+        GestureDetector(
+          onTap: _pickImage,
+          child: Stack(
+            children: [
+              CircleAvatar(
+                radius: 45,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: imageProvider,
+                child: imageProvider == null ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
               ),
-            ),
-          ],
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(color: Color(0xFF0D6EFD), shape: BoxShape.circle),
+                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(width: 20),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(customer.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+              Text(
+                customer.name,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              ),
               Row(
                 children: [
                   const Text('Role: ', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  Text(customer.role.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D6EFD))),
+                  Text(
+                    customer.role.toUpperCase(),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D6EFD)),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -183,7 +392,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade100)),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
                       child: Column(
                         children: [
                           const Text('4.9', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
@@ -200,7 +409,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade100)),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
                       child: Column(
                         children: [
                           const Text('Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.green)),
@@ -249,8 +458,9 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
             borderRadius: BorderRadius.circular(3),
           ),
           const SizedBox(height: 16),
-          _buildCompletionStep('Customer Name Node', true),
-          _buildCompletionStep('Communication Link', true),
+          _buildCompletionStep('Customer Name Node', _nameController.text.isNotEmpty),
+          _buildCompletionStep('Email & Mobile Route', _emailController.text.isNotEmpty && _phoneController.text.isNotEmpty),
+          _buildCompletionStep('National ID & DOB', _nidController.text.isNotEmpty && _dobController.text.isNotEmpty),
           _buildCompletionStep('Identity Avatar Image', completion > 80),
         ],
       ),
@@ -270,7 +480,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     );
   }
 
-  Widget _buildSettingsList(CustomerResponseModel customer) {
+  Widget _buildSettingsForm(CustomerResponseModel customer) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -279,23 +489,57 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
       ),
       child: Column(
         children: [
-          _buildSettingTile(Icons.person_outline, 'Full Customer Name', customer.name),
+          _buildEditableField(
+            icon: Icons.person_outline,
+            label: 'Full Customer Name',
+            controller: _nameController,
+          ),
           const Divider(height: 1, indent: 60),
-          _buildSettingTile(Icons.email_outlined, 'Corporate Secure Email', customer.email),
+          _buildEditableField(
+            icon: Icons.email_outlined,
+            label: 'Corporate Secure Email',
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+          ),
           const Divider(height: 1, indent: 60),
-          _buildSettingTile(Icons.phone_outlined, 'Secure Mobile Route', customer.phone),
+          _buildEditableField(
+            icon: Icons.phone_outlined,
+            label: 'Secure Mobile Route',
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+          ),
           const Divider(height: 1, indent: 60),
-          _buildSettingTile(Icons.male_outlined, 'Gender Node', customer.gender.toUpperCase(), hasChevron: true),
+          _buildGenderSelector(),
           const Divider(height: 1, indent: 60),
-          _buildSettingTile(Icons.calendar_today_outlined, 'Date of Birth', customer.dob, hasChevron: true),
+          _buildEditableField(
+            icon: Icons.calendar_today_outlined,
+            label: 'Date of Birth (YYYY-MM-DD)',
+            controller: _dobController,
+            readOnly: true,
+            onTap: _selectDob,
+            trailingIcon: Icons.calendar_month,
+          ),
           const Divider(height: 1, indent: 60),
-          _buildSettingTile(Icons.badge_outlined, 'National ID (NID)', customer.nidNumber, hasChevron: true),
+          _buildEditableField(
+            icon: Icons.badge_outlined,
+            label: 'National ID (NID)',
+            controller: _nidController,
+            keyboardType: TextInputType.number,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingTile(IconData icon, String label, String value, {bool hasChevron = false}) {
+  Widget _buildEditableField({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    IconData? trailingIcon,
+  }) {
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
@@ -303,9 +547,64 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
         child: Icon(icon, color: AppTheme.primary, size: 20),
       ),
       title: Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
-      subtitle: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-      trailing: hasChevron ? const Icon(Icons.chevron_right, size: 20, color: Colors.grey) : null,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      subtitle: _isEditing
+          ? Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: TextField(
+                controller: controller,
+                readOnly: readOnly,
+                onTap: onTap,
+                keyboardType: keyboardType,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: AppTheme.primary)),
+                ),
+              ),
+            )
+          : Text(
+              controller.text.isEmpty ? 'Not set' : controller.text,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            ),
+      trailing: trailingIcon != null
+          ? IconButton(icon: Icon(trailingIcon, size: 20, color: AppTheme.primary), onPressed: onTap)
+          : null,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+    );
+  }
+
+  Widget _buildGenderSelector() {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
+        child: const Icon(Icons.male_outlined, color: AppTheme.primary, size: 20),
+      ),
+      title: const Text('Gender Node', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+      subtitle: _isEditing
+          ? DropdownButtonFormField<String>(
+              value: ['MALE', 'FEMALE', 'OTHER'].contains(_genderController.text.toUpperCase())
+                  ? _genderController.text.toUpperCase()
+                  : 'MALE',
+              decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+              items: const [
+                DropdownMenuItem(value: 'MALE', child: Text('MALE')),
+                DropdownMenuItem(value: 'FEMALE', child: Text('FEMALE')),
+                DropdownMenuItem(value: 'OTHER', child: Text('OTHER')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => _genderController.text = val);
+                }
+              },
+            )
+          : Text(
+              _genderController.text.toUpperCase(),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
     );
   }
 
@@ -335,7 +634,26 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           const Divider(color: Color(0xFFDBEAFE), height: 24),
           const Text('Detailed Dispatch Address HQ', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(customer.address, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF1E293B))),
+          if (_isEditing)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: TextField(
+                controller: _addressController,
+                maxLines: 2,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF1E293B)),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.all(10),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                ),
+              ),
+            )
+          else
+            Text(
+              _addressController.text.isEmpty ? customer.address : _addressController.text,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF1E293B)),
+            ),
         ],
       ),
     );
@@ -349,7 +667,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           style: const TextStyle(fontSize: 12, color: Colors.black87),
           children: [
             TextSpan(text: '$label: ', style: const TextStyle(fontWeight: FontWeight.w500)),
-            TextSpan(text: value, style: const TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: value.isEmpty ? 'N/A' : value, style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
       ),

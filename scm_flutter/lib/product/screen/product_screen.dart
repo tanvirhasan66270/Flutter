@@ -223,103 +223,111 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 
   // Card Design
   Widget _buildProductCard(ProductResponseModel product, int indexNumber) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                Container(
-                  height: 100,
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(8),
-                  child: () {
-                    final imageUrl = _resolveImageUrl(product.image);
-                    return imageUrl.isNotEmpty
-                        ? Image.network(imageUrl, fit: BoxFit.contain, errorBuilder: (ctx, err, st) => const Icon(Icons.image, size: 40, color: Colors.grey))
-                        : const Icon(Icons.image_not_supported, size: 40, color: Colors.grey);
-                  }(),
-                ),
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text('#$indexNumber', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, '/product-details', arguments: product);
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text('ELECTRONICS', style: TextStyle(color: Colors.blue, fontSize: 8, fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    product.productCode,
-                    style: const TextStyle(color: Colors.grey, fontSize: 10),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Price:', style: TextStyle(color: Colors.grey, fontSize: 10)),
-                      Text(
-                        '৳${product.sellingPrice.toStringAsFixed(2)}',
-                        style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  SizedBox(
+                    height: 100,
                     width: double.infinity,
-                    height: 28,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.blue.shade200),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                        padding: EdgeInsets.zero,
+                    padding: const EdgeInsets.all(8),
+                    child: () {
+                      final imageUrl = _resolveImageUrl(product.image);
+                      return imageUrl.isNotEmpty
+                          ? Image.network(imageUrl, fit: BoxFit.contain, errorBuilder: (ctx, err, st) => const Icon(Icons.image, size: 40, color: Colors.grey))
+                          : const Icon(Icons.image_not_supported, size: 40, color: Colors.grey);
+                    }(),
+                  ),
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text('View Details', style: TextStyle(color: Colors.blue, fontSize: 11)),
-                          SizedBox(width: 4),
-                          Icon(Icons.chevron_right, size: 14, color: Colors.blue),
-                        ],
-                      ),
+                      child: Text('#$indexNumber', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
               ),
-            ),
-          ]),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('ELECTRONICS', style: TextStyle(color: Colors.blue, fontSize: 8, fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      product.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      product.productCode,
+                      style: const TextStyle(color: Colors.grey, fontSize: 10),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Price:', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                        Text(
+                          '৳${product.sellingPrice.toStringAsFixed(2)}',
+                          style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 28,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.blue.shade200),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          padding: EdgeInsets.zero,
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/product-details', arguments: product);
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text('View Details', style: TextStyle(color: Colors.blue, fontSize: 11)),
+                            SizedBox(width: 4),
+                            Icon(Icons.chevron_right, size: 14, color: Colors.blue),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ]),
+      ),
     );
   }
 }

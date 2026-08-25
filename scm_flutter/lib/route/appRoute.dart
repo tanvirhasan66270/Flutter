@@ -4,16 +4,19 @@ import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/auth/screen/forgetPasswordScreen.dart';
 import 'package:scm_flutter/auth/screen/loginScreen.dart';
 import 'package:scm_flutter/auth/screen/verifyEmail.dart';
-import 'package:scm_flutter/auth/system/massage/chat_workspace_screen.dart';
 import 'package:scm_flutter/cutomer/screen/add_payment_screen.dart';
 import 'package:scm_flutter/cutomer/screen/billing_ledger_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customerDashboardScreen.dart';
+import 'package:scm_flutter/cutomer/screen/customer_order_data_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_order_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_oredr_track_page.dart';
 import 'package:scm_flutter/cutomer/screen/customer_profile_screen.dart';
+import 'package:scm_flutter/entity/productModel.dart';
 import 'package:scm_flutter/invoice/invoice_portal_screen.dart';
+import 'package:scm_flutter/product/screen/product_details_screen.dart';
 import 'package:scm_flutter/product/screen/product_screen.dart';
-import 'package:scm_flutter/auth/system/notification/notification_screen.dart';
+import 'package:scm_flutter/system/massage/chat_workspace_screen.dart';
+import 'package:scm_flutter/system/notification/notification_screen.dart';
 
 
 /// Mirrors app.routes.ts + guards/auth-guard.ts + role-redirect component.
@@ -67,10 +70,23 @@ settings: settings,
       settings: settings,
     );
 
+  case '/product-details':
+    final product = settings.arguments as ProductResponseModel;
+    return MaterialPageRoute(
+      builder: (_) => _RequireAuth(child: ProductDetailsScreen(product: product)),
+      settings: settings,
+    );
+
 // ── Customer (auth-guarded) ─────────────────────────
   case '/dashboard':
     return MaterialPageRoute(
       builder: (_) => const _RequireAuth(child: CustomerDashboardScreen()),
+      settings: settings,
+    );
+
+  case '/customer-orders':
+    return MaterialPageRoute(
+      builder: (_) => const _RequireAuth(child: CustomerOrderDataScreen()),
       settings: settings,
     );
 

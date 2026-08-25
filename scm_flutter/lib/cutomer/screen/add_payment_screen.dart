@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -134,7 +135,13 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.file(
+              child: kIsWeb
+                  ? Image.network(
+                _pickedFile!.path,
+                height: 180,
+                fit: BoxFit.contain,
+              )
+                  : Image.file(
                 File(_pickedFile!.path),
                 height: 180,
                 fit: BoxFit.contain,

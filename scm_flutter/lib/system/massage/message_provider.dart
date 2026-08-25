@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
-import 'package:scm_flutter/auth/system/massage/message_repository.dart';
 import 'package:scm_flutter/entity/massage_model.dart';
+import 'package:scm_flutter/system/massage/message_repository.dart';
 
 
 /// ১. MessageRepository

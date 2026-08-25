@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/util/apiClint.dart';
+import 'package:scm_flutter/util/pdf_invoice_generator.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
 
 class InvoicePortalScreen extends ConsumerStatefulWidget {
@@ -142,11 +143,46 @@ class _InvoicePortalScreenState extends ConsumerState<InvoicePortalScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        ElevatedButton.icon(
-          onPressed: () {}, // Implementation for doc export could go here
-          icon: const Icon(Icons.file_download_outlined), 
-          label: const Text('Export Word Document (.doc)'),
-          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2B579A), minimumSize: const Size(double.infinity, 50)),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  try {
+                    await PdfInvoiceGenerator.downloadOrPrint(order: order);
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error generating PDF invoice: $e'), backgroundColor: Colors.red),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+                label: const Text('Download PDF Invoice'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(0, 50),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {}, // Implementation for doc export could go here
+                icon: const Icon(Icons.file_download_outlined, color: Colors.white),
+                label: const Text('Export Word (.doc)'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2B579A),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(0, 50),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

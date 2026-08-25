@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
-import 'package:scm_flutter/auth/system/notification/notification_repository.dart';
+import 'package:scm_flutter/system/notification/notification_repository.dart';
 
 
 /// ১. NotificationRepository

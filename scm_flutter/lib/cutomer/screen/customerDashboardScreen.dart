@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
-import 'package:scm_flutter/auth/system/notification/notification_provider.dart';
 import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
+import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/system/notification/notification_provider.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
+import 'package:scm_flutter/util/pdf_invoice_generator.dart';
 
 class CustomerDashboardScreen extends ConsumerStatefulWidget {
   const CustomerDashboardScreen({super.key});
@@ -87,7 +89,6 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
     final orderSummaryAsync = ref.watch(customerOrderSummaryProvider);
     final myOrdersAsync = ref.watch(myCustomerOrdersProvider);
     final productListAsync = ref.watch(productListProvider);
-    final unreadNotificationAsync = ref.watch(notificationUnreadCountProvider);
 
     final String userName = (currentUser?.name != null && currentUser!.name.isNotEmpty)
         ? currentUser.name
@@ -112,17 +113,6 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Menu tapped'),
-                duration: Duration(seconds: 1),
-              ),
-            );
-          },
-        ),
         title: Row(
           children: [
             Container(
@@ -141,35 +131,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
           ],
         ),
         actions: [
-          IconButton(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_outlined, color: Colors.black87),
-                unreadNotificationAsync.when(
-                  data: (count) {
-                    if (count <= 0) return const SizedBox.shrink();
-                    return Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        child: Text(
-                          '$count',
-                          style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    );
-                  },
-                  loading: () => const SizedBox.shrink(),
-                  error: (e, st) => const SizedBox.shrink(),
-                ),
-              ],
-            ),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/notifications');
-            },
-          ),
+          const DynamicNotificationButton(),
           Padding(
             padding: const EdgeInsets.only(right: 4),
             child: GestureDetector(
@@ -470,7 +432,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                 children: [
                   const Text('Active Order Pipeline', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   GestureDetector(
-                    onTap: () => Navigator.of(context).pushNamed('/customer-order-track'),
+                    onTap: () => Navigator.of(context).pushNamed('/customer-orders'),
                     child: const Text('View All →', style: TextStyle(color: Color(0xFF2563EB), fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
@@ -490,7 +452,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                   child: Center(child: Text('Error loading orders: $err', style: const TextStyle(color: Colors.red))),
                 ),
                 data: (summary) {
-                  final recentOrders = summary.recent;
+                  final recentOrders = summary.recent.take(5).toList();
                   if (recentOrders.isEmpty) {
                     return Container(
                       width: double.infinity,
@@ -560,6 +522,16 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                               ],
                             ),
                           ),
+                          trailing: IconButton(
+                            tooltip: 'View Order PDF',
+                            icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF1E40AF), size: 22),
+                            onPressed: () async {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Generating PDF for ${order.orderNumber}...'), duration: const Duration(seconds: 1)),
+                              );
+                              await PdfInvoiceGenerator.downloadOrPrint(order: order);
+                            },
+                          ),
                           onTap: () {
                             Navigator.of(context).pushNamed(
                               '/customer-order-track',
@@ -614,85 +586,94 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                         final item = products[index];
                         final bool inStock = item.quantity > 0;
 
-                        return Container(
-                          width: 170,
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Builder(
-                                  builder: (context) {
-                                    final imageUrl = _resolveProductImageUrl(item.image);
-                                    return Center(
-                                      child: imageUrl.isNotEmpty
-                                          ? Image.network(
-                                              imageUrl,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.inventory_2_outlined, color: Colors.grey, size: 40),
-                                            )
-                                          : const Icon(Icons.inventory_2_outlined, color: Colors.grey, size: 40),
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                item.name,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                              const Spacer(),
-                              Text(
-                                '৳${item.sellingPrice.toStringAsFixed(2)}',
-                                style: const TextStyle(color: Color(0xFF2563EB), fontSize: 13, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Icon(
-                                    inStock ? Icons.check_circle : Icons.remove_circle_outline,
-                                    color: inStock ? Colors.green : Colors.red,
-                                    size: 12,
+                        return InkWell(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                              '/product-details',
+                              arguments: item,
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            width: 170,
+                            margin: const EdgeInsets.only(right: 12),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    inStock ? 'In Stock (${item.quantity})' : 'Out of Stock',
-                                    style: TextStyle(fontSize: 10, color: inStock ? Colors.green : Colors.red),
+                                  child: Builder(
+                                    builder: (context) {
+                                      final imageUrl = _resolveProductImageUrl(item.image);
+                                      return Center(
+                                        child: imageUrl.isNotEmpty
+                                            ? Image.network(
+                                                imageUrl,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.inventory_2_outlined, color: Colors.grey, size: 40),
+                                              )
+                                            : const Icon(Icons.inventory_2_outlined, color: Colors.grey, size: 40),
+                                      );
+                                    },
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 28,
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2563EB),
-                                    foregroundColor: Colors.white,
-                                    padding: EdgeInsets.zero,
-                                    textStyle: const TextStyle(fontSize: 11),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed('/products');
-                                  },
-                                  icon: const Icon(Icons.shopping_cart_outlined, size: 12),
-                                  label: const Text('View Product'),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 8),
+                                Text(
+                                  item.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '৳${item.sellingPrice.toStringAsFixed(2)}',
+                                  style: const TextStyle(color: Color(0xFF2563EB), fontSize: 13, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      inStock ? Icons.check_circle : Icons.remove_circle_outline,
+                                      color: inStock ? Colors.green : Colors.red,
+                                      size: 12,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      inStock ? 'In Stock (${item.quantity})' : 'Out of Stock',
+                                      style: TextStyle(fontSize: 10, color: inStock ? Colors.green : Colors.red),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 28,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF2563EB),
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.zero,
+                                      textStyle: const TextStyle(fontSize: 11),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed('/customer-order');
+                                    },
+                                    icon: const Icon(Icons.shopping_cart_outlined, size: 12),
+                                    label: const Text('Add to Cart'),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },

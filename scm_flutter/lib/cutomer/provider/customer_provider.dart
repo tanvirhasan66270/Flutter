@@ -51,15 +51,19 @@ FutureProvider.autoDispose<({int total, int pending, int active, int completed, 
       final cancelled = orders.where((o) => o.status == OrderStatus.cancelled).length;
 
       final sorted = [...orders]
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        ..sort((a, b) {
+          final cmp = b.createdAt.compareTo(a.createdAt);
+          if (cmp != 0) return cmp;
+          return b.id.compareTo(a.id);
+        });
 
       return (
-      total: total,
-      pending: pending,
-      active: active,
-      completed: completed,
-      cancelled: cancelled,
-      recent: sorted.take(5).toList(),
+        total: total,
+        pending: pending,
+        active: active,
+        completed: completed,
+        cancelled: cancelled,
+        recent: sorted.take(5).toList(),
       );
     });
 
