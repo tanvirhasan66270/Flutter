@@ -39,6 +39,11 @@ class ApiConstants {
   static String customerById(int id) => 'customer/$id';
 
 
+  static const String procurements = 'procurements';
+   static String procurementById(int id) => 'procurements/$id';
+  static String procurementByUserId(int userId) => 'procurements/user/$userId';
+
+
   // ── Drivers ────────────────────────────────────────────
   static const String drivers = 'drivers';
 
@@ -59,6 +64,10 @@ class ApiConstants {
 
   static String supplierById(int id) => 'suppliers/$id';
   static String supplierByUserId(int id) => 'suppliers/user/$id';
+
+  // ── Shipments (Added for Shipment Controller) ──────────
+  static const String shipments = 'shipments';
+  static String shipmentById(int id) => 'shipments/$id';
 
 
 
@@ -136,6 +145,9 @@ class ApiConstants {
   static String trackPoLineItem(String trackingNumber) => 'po-line-items/track/$trackingNumber';
 
 
+
+
+
   // ── Goods Received Notes (GRN) ─────────────────────────
   static const String goodsReceivedNotes = 'goods-received-notes';
   static String goodsReceivedNoteById(int id) => 'goods-received-notes/$id';
@@ -201,5 +213,8 @@ class ApiConstants {
   static const String notificationUnreadCount = 'notifications/unread-count';
   static const String notificationReadAll = 'notifications/read-all';
   static String notificationRead(int id) => 'notifications/$id/read';
+
+
+
 
 }

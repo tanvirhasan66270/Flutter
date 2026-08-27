@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'SCM Express',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light_,
-      initialRoute: '/',
+      initialRoute: '/login',
       onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }

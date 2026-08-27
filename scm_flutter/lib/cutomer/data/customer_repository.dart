@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:scm_flutter/entity/customerModel.dart';
 import 'package:scm_flutter/util/apiClint.dart';
