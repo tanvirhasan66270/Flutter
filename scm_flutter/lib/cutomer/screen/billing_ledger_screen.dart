@@ -4,6 +4,7 @@ import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/cutomer/provider/payment_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/payment_statement_model.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiClint.dart';
 import 'package:scm_flutter/util/pdf_statement_generator.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
@@ -44,19 +45,19 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
     final currentPayments = paymentsAsync?.value ?? [];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
-        title: const Text('Billing Ledger', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.white,
+        title: const Text('Billing Ledger', style: TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: AppTheme.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black87),
+        leading: const BackButton(color: AppTheme.dark),
         actions: [
           if (orderAsync != null && orderAsync.hasValue)
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: IconButton(
                 tooltip: 'Download PDF Statement',
-                icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF1E40AF)),
+                icon: const Icon(Icons.picture_as_pdf, color: AppTheme.primary),
                 onPressed: _isGeneratingPdf ? null : () => _downloadPdf(orderAsync.value!, currentPayments),
               ),
             ),
@@ -93,21 +94,21 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)]),
+        gradient: const LinearGradient(colors: [AppTheme.primaryDark, AppTheme.blue]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Payment Statement', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Payment Statement', style: TextStyle(color: AppTheme.white, fontSize: 18, fontWeight: FontWeight.bold)),
           const Text('Consolidated financial log for your orders', style: TextStyle(color: Colors.white70, fontSize: 11)),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
+            decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(30)),
             child: Row(
               children: [
-                const Icon(Icons.receipt_long, color: Colors.grey, size: 20),
+                const Icon(Icons.receipt_long, color: AppTheme.grey, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
@@ -118,7 +119,7 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
                 ),
                 IconButton(
                   onPressed: () => setState(() => _searchedCode = _searchController.text.trim()),
-                  icon: const Icon(Icons.search, color: Color(0xFF1E40AF)),
+                  icon: const Icon(Icons.search, color: AppTheme.primary),
                 ),
               ],
             ),
@@ -135,7 +136,7 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: AppTheme.danger),
         );
       }
     } finally {
@@ -161,12 +162,12 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
                     ElevatedButton.icon(
                       onPressed: _isGeneratingPdf ? null : () => _downloadPdf(order, payments),
                       icon: _isGeneratingPdf
-                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.white))
                           : const Icon(Icons.picture_as_pdf, size: 16),
                       label: const Text('PDF Download', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1E40AF),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppTheme.primary,
+                        foregroundColor: AppTheme.white,
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
@@ -177,9 +178,9 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
             ),
             const SizedBox(height: 16),
             Row(children: [
-              _statItem('Grand Total', '৳${order.totalAmount}', Colors.blue),
-              _statItem('Total Paid', '৳${order.paidAmount}', Colors.green),
-              _statItem('Balance Due', '৳${order.dueAmount}', Colors.red),
+              _statItem('Grand Total', '৳${order.totalAmount}', AppTheme.blue),
+              _statItem('Total Paid', '৳${order.paidAmount}', AppTheme.success),
+              _statItem('Balance Due', '৳${order.dueAmount}', AppTheme.danger),
             ]),
           ],
         ),
@@ -189,7 +190,7 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
 
   Widget _statItem(String label, String value, Color color) {
     return Expanded(child: Column(children: [
-      Text(label, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+      Text(label, style: const TextStyle(color: AppTheme.grey, fontSize: 10)),
       Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: color)),
     ]));
   }
@@ -201,23 +202,23 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('TRANSACTION HISTORY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+        const Text('TRANSACTION HISTORY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.grey)),
         const SizedBox(height: 10),
         ...payments.map((p) => Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
+          decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.borderGrey)),
           child: Row(
             children: [
-              CircleAvatar(backgroundColor: Colors.blue.shade50, child: const Icon(Icons.payment, size: 18, color: Colors.blue)),
+              CircleAvatar(backgroundColor: AppTheme.blueLight.withValues(alpha: 0.2), child: const Icon(Icons.payment, size: 18, color: AppTheme.blue)),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.paymentMethod, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                Text(p.createdAt.substring(0, 16).replaceFirst('T', ' '), style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                Text(p.createdAt.substring(0, 16).replaceFirst('T', ' '), style: const TextStyle(color: AppTheme.grey, fontSize: 10)),
               ])),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('৳${p.paidAmount}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 13)),
-                Text(PaymentStatementStatusMeta.labelFor(p.issueStatus), style: TextStyle(fontSize: 9, color: p.issueStatus == PaymentStatementStatus.confirmedByOfficer ? Colors.green : Colors.orange)),
+                Text('৳${p.paidAmount}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.success, fontSize: 13)),
+                Text(PaymentStatementStatusMeta.labelFor(p.issueStatus), style: TextStyle(fontSize: 9, color: p.issueStatus == PaymentStatementStatus.confirmedByOfficer ? AppTheme.success : AppTheme.warning)),
               ]),
             ],
           ),
@@ -227,6 +228,6 @@ class _BillingLedgerScreenState extends ConsumerState<BillingLedgerScreen> {
   }
 
   Widget _buildEmptyState(String msg) {
-    return Center(child: Padding(padding: const EdgeInsets.all(40), child: Text(msg, style: const TextStyle(color: Colors.grey, fontSize: 12))));
+    return Center(child: Padding(padding: const EdgeInsets.all(40), child: Text(msg, style: const TextStyle(color: AppTheme.grey, fontSize: 12))));
   }
 }

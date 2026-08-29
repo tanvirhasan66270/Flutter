@@ -34,7 +34,7 @@ class ApiConstants {
   static const String verifyEmail = 'auth/verify-email';
 
   // ── Customer ───────────────────────────────────────────
-  static const String customer = 'customer/';
+  static const String customer = 'customer';
   static String customerByUserId(int userId) => 'customer/user/$userId';
   static String customerById(int id) => 'customer/$id';
 
@@ -69,6 +69,11 @@ class ApiConstants {
   static const String shipments = 'shipments';
   static String shipmentById(int id) => 'shipments/$id';
 
+  // ── QC Inspector Endpoints (Mirrors /api/qc-inspectors) ─
+  static const String qcInspectors = 'qc-inspectors';
+  static String qcInspectorById(int id) => 'qc-inspectors/$id';
+  static String qcInspectorByUserId(int userId) => 'qc-inspectors/user/$userId';
+
 
 
 
@@ -87,6 +92,10 @@ class ApiConstants {
   static const String categories = 'category';
   static String categoryById(int id) => 'category/$id';
   static const String publicCategories = 'category/public';
+
+  // ── Warehouse Endpoints (Mirrors /api/warehouse) ────────
+  static const String warehouse = 'warehouse';
+  static String warehouseById(int id) => 'warehouse/$id';
 
 
 
@@ -112,6 +121,21 @@ class ApiConstants {
 
   static String deliveryTripById(int id) => 'delivery-trips/$id';
   static String updateDeliveryTripStatus(int id) => 'delivery-trips/$id/status';
+
+
+  static const String banks = 'banks';
+  static String bankById(int id) => 'banks/$id';
+
+
+  // ── Letter of Credit (LC) Endpoints (Mirrors /api/lc) ──
+  static const String lcs = 'lc';
+  static String lcById(int id) => 'lc/$id';
+  static String amendLc(int id) => 'lc/amend/$id';
+
+
+  // ── Invoice Endpoints (Mirrors /api/invoices) ───────────
+  static const String invoices = 'invoices';
+  static String invoiceById(int id) => 'invoices/$id';
 
 
   // ── Purchase Requisitions ──────────────────────────────
@@ -154,10 +178,7 @@ class ApiConstants {
 
 
 
-  // ── Invoices ───────────────────────────────────────────
-  static const String invoices = 'invoices';
 
-  static String invoiceById(int id) => 'invoices/$id';
 
 
 
@@ -200,6 +221,28 @@ class ApiConstants {
   // ── Vehicles ───────────────────────────────────────────
   static const String vehicles = 'vehicles';
   static String vehicleById(int id) => 'vehicles/$id';
+
+
+  // ── Inventory Endpoints ────────────────────────────────
+  static const String inventories = 'inventories';
+  static String inventoryById(int id) => 'inventories/$id';
+
+  // ── Reports Endpoints ──────────────────────────────────
+  static const String reports = 'reports';
+  static String reportById(int id) => 'reports/$id';
+  static String reportsByWarehouse(String warehouseId) => 'reports/warehouse/$warehouseId';
+  static String approveReport(int id) => 'reports/approve/$id';
+  static const String emailApproveReport = 'reports/email-approve';
+  static String reportUploads(String filename) => 'reports/uploads/reports/$filename';
+
+  // ── GRN Line Items Endpoints ─────────────────────────────
+  static const String grnLineItems = 'grn-line-items';
+  static String grnLineItemById(int id) => 'grn-line-items/$id';
+
+
+  // ── Stock Movements Endpoints ───────────────────────────
+  static const String stockMovements = 'stock-movements';
+  static String stockMovementById(int id) => 'stock-movements/$id';
 
 ///Massage
   static const String messages = 'messages';

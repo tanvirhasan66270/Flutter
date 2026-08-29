@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
-import 'package:scm_flutter/entity/po_line_item_model.dart';
 import 'package:scm_flutter/entity/purchase-order_model.dart';
 import 'package:scm_flutter/entity/quatation_model.dart';
-import 'package:scm_flutter/entity/shipment_model.dart';
 import 'package:scm_flutter/entity/supplier_model.dart';
 import 'package:scm_flutter/entity/purchase_requisition_model.dart';
 import 'package:scm_flutter/procourment/provider/purchase_order_provider.dart';
@@ -15,7 +13,6 @@ import 'package:scm_flutter/suppplier/provider/quotation_provider.dart';
 import 'package:scm_flutter/suppplier/provider/shipment_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
 import 'package:scm_flutter/suppplier/screen/supplier_form_screen.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
@@ -223,126 +220,6 @@ class _SupplierDashboardScreenState extends ConsumerState<SupplierDashboardScree
     );
   }
 
-  void _showShortcutModal(String type, List<PurchaseOrderResponse> pos, List<QuotationResponseModel> rfqs, List<ShipmentResponseModel> shipments, List<POLineItemResponseDTO> lineItems) {
-    setState(() => modalSearchText = '');
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          String title = 'Shortcut Registry';
-          IconData icon = Icons.list;
-          List<dynamic> items = [];
-
-          if (type == 'SHORTCUT_PO') {
-            title = 'Purchase Orders (Last 30 Days)';
-            icon = Icons.shopping_bag_outlined;
-            items = pos;
-          } else if (type == 'SHORTCUT_RFQ') {
-            title = 'Quotations & Bids (Last 30 Days)';
-            icon = Icons.request_quote_outlined;
-            items = rfqs;
-          } else if (type == 'SHORTCUT_SHIPMENT') {
-            title = 'Cargo Shipments (Last 30 Days)';
-            icon = Icons.local_shipping_outlined;
-            items = shipments;
-          } else if (type == 'SHORTCUT_POLINE') {
-            title = 'PO Line Items (Last 30 Days)';
-            icon = Icons.format_list_bulleted;
-            items = lineItems;
-          } else if (type == 'SHORTCUT_LC') {
-            title = 'Letters of Credit (Last 30 Days)';
-            icon = Icons.account_balance_outlined;
-            items = pos.where((p) => p.status == 'RECEIVED' || p.status == 'APPROVED').toList();
-          }
-
-          final filteredItems = items.where((it) {
-            if (modalSearchText.trim().isEmpty) return true;
-            return it.toString().toLowerCase().contains(modalSearchText.toLowerCase());
-          }).toList();
-
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            contentPadding: const EdgeInsets.all(16),
-            title: Row(
-              children: [
-                Icon(icon, color: AppTheme.primary),
-                const SizedBox(width: 8),
-                Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold))),
-              ],
-            ),
-            content: SizedBox(
-              width: screenWidth > 600 ? 480 : screenWidth * 0.85,
-              height: 360,
-              child: Column(
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search records...',
-                      prefixIcon: const Icon(Icons.search, size: 18),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      isDense: true,
-                    ),
-                    onChanged: (val) => setModalState(() => modalSearchText = val),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: filteredItems.isEmpty
-                        ? const Center(child: Text('No records found in registry.', style: TextStyle(color: AppTheme.secondary, fontSize: 12)))
-                        : ListView.separated(
-                            itemCount: filteredItems.length,
-                            separatorBuilder: (ctx, idx) => const Divider(height: 1),
-                            itemBuilder: (context, idx) {
-                              final item = filteredItems[idx];
-                              if (type == 'SHORTCUT_PO' || type == 'SHORTCUT_LC') {
-                                final po = item as PurchaseOrderResponse;
-                                return ListTile(
-                                  dense: true,
-                                  title: Text(po.poNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace', fontSize: 11)),
-                                  subtitle: Text('Supplier: ${po.supplierName} - Date: ${po.expectedDeliveryDate}', style: const TextStyle(fontSize: 9)),
-                                  trailing: Text('\$${po.totalAmount.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.success, fontSize: 11)),
-                                );
-                              } else if (type == 'SHORTCUT_RFQ') {
-                                final q = item as QuotationResponseModel;
-                                return ListTile(
-                                  dense: true,
-                                  title: Text(q.productName.isNotEmpty ? q.productName : 'Quotation #${q.id}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                                  subtitle: Text('Supplier: ${q.supplierName} - Status: ${q.status}', style: const TextStyle(fontSize: 9)),
-                                  trailing: Text('\$${q.totalPrice}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary, fontSize: 11)),
-                                );
-                              } else if (type == 'SHORTCUT_SHIPMENT') {
-                                final s = item as ShipmentResponseModel;
-                                return ListTile(
-                                  dense: true,
-                                  title: Text('Shipment #${s.shipmentNumber}', style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace', fontSize: 11)),
-                                  subtitle: Text('Origin: ${s.origin} - Vehicle: ${s.vehicleNumber}', style: const TextStyle(fontSize: 9)),
-                                  trailing: Text('${s.shipmentQuantity} Qty', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary, fontSize: 11)),
-                                );
-                              } else {
-                                final l = item as POLineItemResponseDTO;
-                                return ListTile(
-                                  dense: true,
-                                  title: Text(l.productName.isNotEmpty ? l.productName : 'Line Item #${l.id}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                                  subtitle: Text('PO: ${l.poNumber} - Unit Price: \$${l.unitPrice}', style: const TextStyle(fontSize: 9)),
-                                  trailing: Text('${l.quantity} Qty', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                                );
-                              }
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CLOSE')),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -358,7 +235,6 @@ class _SupplierDashboardScreenState extends ConsumerState<SupplierDashboardScree
 
     final userName = currentUser?.name ?? 'Supplier Node';
     final userRole = (currentUser?.role ?? 'SUPPLIER').toUpperCase();
-    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'S';
 
     final suppliers = supplierListAsync.value ?? [];
     final allPOs = purchaseOrdersAsync.value ?? [];
@@ -604,60 +480,6 @@ class _SupplierDashboardScreenState extends ConsumerState<SupplierDashboardScree
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // ── ProcurementDashboardScreen Exact Header ──
-  Widget _buildTopBar(String userName, String userInitial) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.business_center_outlined, color: AppTheme.primary, size: 22),
-              ),
-              const SizedBox(width: 8),
-              const Text('SCM ENTERPRISE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
-            ],
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.refresh, color: AppTheme.secondary, size: 20),
-                onPressed: () {
-                  ref.invalidate(supplierListProvider);
-                  ref.invalidate(purchaseOrderListProvider);
-                  ref.invalidate(quotationListProvider);
-                  ref.invalidate(purchaseRequisitionListProvider);
-                  ref.invalidate(shipmentListProvider);
-                  ref.invalidate(poLineItemListProvider);
-                },
-              ),
-              const DynamicNotificationButton(),
-              const SizedBox(width: 4),
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppTheme.primary,
-                child: Text(userInitial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.logout, color: AppTheme.danger, size: 20),
-                onPressed: () {
-                  ref.read(authControllerProvider.notifier).logout();
-                  Navigator.of(context).pushReplacementNamed('/login');
-                },
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

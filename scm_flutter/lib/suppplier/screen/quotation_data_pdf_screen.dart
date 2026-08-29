@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:scm_flutter/entity/quatation_model.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class QuotationDataPDFScreen extends StatelessWidget {
   final QuotationResponseModel quotation;
@@ -203,7 +204,7 @@ class QuotationDataPDFScreen extends StatelessWidget {
     final qtnNo = quotation.quotationNumber.isNotEmpty ? quotation.quotationNumber : 'QTN-${quotation.id}';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         title: Text(
           'Quotation Document #$qtnNo',

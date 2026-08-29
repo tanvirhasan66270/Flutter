@@ -9,7 +9,6 @@ import 'package:scm_flutter/procourment/provider/purchase_requisition_provider.d
 import 'package:scm_flutter/product/provider/product_provider.dart';
 import 'package:scm_flutter/suppplier/provider/quotation_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
@@ -213,11 +212,11 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // LINKED PURCHASE REQUISITION VECTOR
-                      _buildSectionLabel('LINKED PURCHASE REQUISITION VECTOR *'),
+                      // Step 1: LINKED PURCHASE REQUISITION VECTOR
+                      _buildNumberedStepLabel(1, 'LINKED PURCHASE REQUISITION VECTOR *'),
                       DropdownButtonFormField<int>(
                         isExpanded: true,
-                        value: purchaseRequisitionId == 0 ? null : purchaseRequisitionId,
+                        initialValue: purchaseRequisitionId == 0 ? null : purchaseRequisitionId,
                         hint: const Text('-- Select Linked Requisition Node --', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
                         decoration: _inputDecoration(),
                         items: requisitions.map((req) {
@@ -235,8 +234,8 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                       ),
                       const SizedBox(height: 14),
 
-                      // TARGET VENDOR NODE
-                      _buildSectionLabel('TARGET VENDOR NODE *'),
+                      // Step 2: TARGET VENDOR NODE
+                      _buildNumberedStepLabel(2, 'TARGET VENDOR NODE *'),
                       if (isSupplierRole)
                         TextFormField(
                           readOnly: true,
@@ -247,7 +246,7 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                       else
                         DropdownButtonFormField<int>(
                           isExpanded: true,
-                          value: supplierId == 0 ? null : supplierId,
+                          initialValue: supplierId == 0 ? null : supplierId,
                           hint: const Text('-- Select Supplier Entity --', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
                           decoration: _inputDecoration(),
                           items: suppliers.map((sup) {
@@ -265,57 +264,40 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                         ),
                       const SizedBox(height: 14),
 
-                      // ROW: UNIT BID COST ($) & SUPPLY VOLUME (QTY)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('UNIT BID COST (\$) *'),
-                                TextFormField(
-                                  controller: _unitPriceController,
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration().copyWith(prefixText: '\$ '),
-                                  onChanged: (val) => unitPrice = double.tryParse(val) ?? 0.0,
-                                ),
-                              ],
-                            ),
+                      // Step 3: UNIT BID COST ($)
+                      _buildNumberedStepLabel(3, 'UNIT BID COST (\$) *'),
+                      TextFormField(
+                        controller: _unitPriceController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                        decoration: _inputDecoration().copyWith(prefixText: '\$ '),
+                        onChanged: (val) => unitPrice = double.tryParse(val) ?? 0.0,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 4: SUPPLY VOLUME (QTY)
+                      _buildNumberedStepLabel(4, 'SUPPLY VOLUME (QTY) *'),
+                      TextFormField(
+                        controller: _quantityController,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                          color: !quantityValid ? Colors.red : Colors.black87,
+                        ),
+                        decoration: _inputDecoration().copyWith(
+                          suffixText: 'Pcs',
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: !quantityValid ? Colors.red : AppTheme.borderGrey),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('SUPPLY VOLUME (QTY) *'),
-                                TextFormField(
-                                  controller: _quantityController,
-                                  keyboardType: TextInputType.number,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'monospace',
-                                    color: !quantityValid ? Colors.red : Colors.black87,
-                                  ),
-                                  decoration: _inputDecoration().copyWith(
-                                    suffixText: 'Pcs',
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: !quantityValid ? Colors.red : AppTheme.borderGrey),
-                                    ),
-                                  ),
-                                  onChanged: (val) {
-                                    setState(() {
-                                      quantity = int.tryParse(val) ?? 1;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            quantity = int.tryParse(val) ?? 1;
+                          });
+                        },
                       ),
                       if (!quantityValid) ...[
                         const SizedBox(height: 4),
@@ -326,87 +308,55 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                       ],
                       const SizedBox(height: 14),
 
-                      // ROW: LEAD TIME & BIDDING STRATEGY STAGE
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('LEAD TIME (DAYS) *'),
-                                TextFormField(
-                                  controller: _leadTimeController,
-                                  keyboardType: TextInputType.number,
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                  decoration: _inputDecoration().copyWith(suffixText: 'Days'),
-                                  onChanged: (val) => leadTimeDays = int.tryParse(val) ?? 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('AUDITING STATE *'),
-                                DropdownButtonFormField<String>(
-                                  value: status,
-                                  decoration: _inputDecoration(),
-                                  items: ['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'EXPIRED']
-                                      .map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold))))
-                                      .toList(),
-                                  onChanged: isSupplierRole ? null : (val) => setState(() => status = val ?? 'PENDING'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 5: LEAD TIME (DAYS)
+                      _buildNumberedStepLabel(5, 'LEAD TIME (DAYS) *'),
+                      TextFormField(
+                        controller: _leadTimeController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        decoration: _inputDecoration().copyWith(suffixText: 'Days'),
+                        onChanged: (val) => leadTimeDays = int.tryParse(val) ?? 1,
                       ),
                       const SizedBox(height: 14),
 
-                      // ROW: RECEIVED DATE & ESTIMATED DELIVERY DATE
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('REQUISITION RECEIVED DATE'),
-                                TextFormField(
-                                  controller: _receivedAtController,
-                                  style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration().copyWith(
-                                    suffixIcon: const Icon(Icons.calendar_today_outlined, size: 16, color: AppTheme.secondary),
-                                  ),
-                                  onChanged: (val) => receivedAt = val,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('ESTIMATED DELIVERY DATE'),
-                                TextFormField(
-                                  controller: _deliveryTimeController,
-                                  style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration().copyWith(
-                                    suffixIcon: const Icon(Icons.calendar_today_outlined, size: 16, color: AppTheme.secondary),
-                                  ),
-                                  onChanged: (val) => deliveryTime = val,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 6: AUDITING STATE
+                      _buildNumberedStepLabel(6, 'AUDITING STATE *'),
+                      DropdownButtonFormField<String>(
+                        initialValue: status,
+                        decoration: _inputDecoration(),
+                        items: ['PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'EXPIRED']
+                            .map((s) => DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold))))
+                            .toList(),
+                        onChanged: isSupplierRole ? null : (val) => setState(() => status = val ?? 'PENDING'),
                       ),
                       const SizedBox(height: 14),
 
-                      // WARRANTY COVERAGE MATRIX
-                      _buildSectionLabel('WARRANTY COVERAGE MATRIX'),
+                      // Step 7: REQUISITION RECEIVED DATE
+                      _buildNumberedStepLabel(7, 'REQUISITION RECEIVED DATE'),
+                      TextFormField(
+                        controller: _receivedAtController,
+                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                        decoration: _inputDecoration().copyWith(
+                          suffixIcon: const Icon(Icons.calendar_today_outlined, size: 16, color: AppTheme.secondary),
+                        ),
+                        onChanged: (val) => receivedAt = val,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 8: ESTIMATED DELIVERY DATE
+                      _buildNumberedStepLabel(8, 'ESTIMATED DELIVERY DATE'),
+                      TextFormField(
+                        controller: _deliveryTimeController,
+                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                        decoration: _inputDecoration().copyWith(
+                          suffixIcon: const Icon(Icons.calendar_today_outlined, size: 16, color: AppTheme.secondary),
+                        ),
+                        onChanged: (val) => deliveryTime = val,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 9: WARRANTY COVERAGE MATRIX
+                      _buildNumberedStepLabel(9, 'WARRANTY COVERAGE MATRIX'),
                       TextFormField(
                         controller: _warrantyController,
                         style: const TextStyle(fontSize: 12),
@@ -415,8 +365,8 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                       ),
                       const SizedBox(height: 14),
 
-                      // ATTACHMENT DOCUMENT ENVELOPE
-                      _buildSectionLabel('ATTACHMENT DOCUMENT ENVELOPE'),
+                      // Step 10: ATTACHMENT DOCUMENT ENVELOPE
+                      _buildNumberedStepLabel(10, 'ATTACHMENT DOCUMENT ENVELOPE'),
                       InkWell(
                         onTap: _pickAttachment,
                         child: Container(
@@ -456,8 +406,8 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                       ),
                       const SizedBox(height: 14),
 
-                      // PRODUCT NOMENCLATURE SPECIFICATIONS
-                      _buildSectionLabel('PRODUCT NOMENCLATURE SPECIFICATIONS'),
+                      // Step 11: PRODUCT NOMENCLATURE SPECIFICATIONS
+                      _buildNumberedStepLabel(11, 'PRODUCT NOMENCLATURE SPECIFICATIONS'),
                       TextFormField(
                         controller: _descriptionController,
                         maxLines: 2,
@@ -467,8 +417,8 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                       ),
                       const SizedBox(height: 14),
 
-                      // SOURCING OPERATIONS NOTES
-                      _buildSectionLabel('SOURCING OPERATIONS NOTES'),
+                      // Step 12: SOURCING OPERATIONS NOTES
+                      _buildNumberedStepLabel(12, 'SOURCING OPERATIONS NOTES'),
                       TextFormField(
                         controller: _notesController,
                         maxLines: 2,
@@ -567,12 +517,28 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildNumberedStepLabel(int stepNum, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary, letterSpacing: 0.3),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary, letterSpacing: 0.3),
+          ),
+        ],
       ),
     );
   }

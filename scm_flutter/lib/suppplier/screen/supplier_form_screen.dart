@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/entity/supplier_model.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
@@ -74,10 +73,6 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = ref.watch(currentUserProvider);
-    final userName = currentUser?.name ?? 'Procurement Officer';
-    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'P';
-
     final isEdit = widget.supplierToEdit != null;
 
     return Scaffold(
@@ -181,8 +176,8 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Section 1: Company / Vendor Details
-                      _buildSectionLabel('VENDOR / COMPANY DETAILS'),
+                      // Step 1: Supplier / Company Name
+                      _buildNumberedStepLabel(1, 'VENDOR / COMPANY NAME *'),
                       TextFormField(
                         controller: nameController,
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'Supplier / Company Name is required' : null,
@@ -190,121 +185,76 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('EMAIL ADDRESS *'),
-                                TextFormField(
-                                  controller: emailController,
-                                  keyboardType: TextInputType.emailAddress,
-                                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Email is required' : null,
-                                  decoration: _inputDecoration(icon: Icons.email_outlined, hint: 'vendor@domain.com'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('PHONE NUMBER *'),
-                                TextFormField(
-                                  controller: phoneController,
-                                  keyboardType: TextInputType.phone,
-                                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Phone number is required' : null,
-                                  decoration: _inputDecoration(icon: Icons.phone_outlined, hint: '+8801...'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 2: Email Address
+                      _buildNumberedStepLabel(2, 'EMAIL ADDRESS *'),
+                      TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Email is required' : null,
+                        decoration: _inputDecoration(icon: Icons.email_outlined, hint: 'vendor@domain.com'),
                       ),
                       const SizedBox(height: 14),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('CONTACT PERSON'),
-                                TextFormField(
-                                  controller: contactPersonController,
-                                  decoration: _inputDecoration(icon: Icons.person_outline, hint: 'Manager / Owner Name'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('NID / REGISTRATION NO'),
-                                TextFormField(
-                                  controller: nidController,
-                                  decoration: _inputDecoration(icon: Icons.badge_outlined, hint: 'NID or Trade License No'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 3: Phone Number
+                      _buildNumberedStepLabel(3, 'PHONE NUMBER *'),
+                      TextFormField(
+                        controller: phoneController,
+                        keyboardType: TextInputType.phone,
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Phone number is required' : null,
+                        decoration: _inputDecoration(icon: Icons.phone_outlined, hint: '+8801...'),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 14),
 
-                      // Section 2: Location & Logistic Parameters
-                      _buildSectionLabel('LOCATION & LOGISTIC SPECIFICATIONS'),
+                      // Step 4: Contact Person
+                      _buildNumberedStepLabel(4, 'CONTACT PERSON'),
+                      TextFormField(
+                        controller: contactPersonController,
+                        decoration: _inputDecoration(icon: Icons.person_outline, hint: 'Manager / Owner Name'),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 5: NID / Registration No
+                      _buildNumberedStepLabel(5, 'NID / REGISTRATION NO'),
+                      TextFormField(
+                        controller: nidController,
+                        decoration: _inputDecoration(icon: Icons.badge_outlined, hint: 'NID or Trade License No'),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 6: Location Address
+                      _buildNumberedStepLabel(6, 'LOCATION & LOGISTIC SPECIFICATIONS'),
                       TextFormField(
                         controller: addressController,
                         decoration: _inputDecoration(icon: Icons.location_on_outlined, hint: 'Full Business Address / Location *'),
                       ),
                       const SizedBox(height: 14),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('AVG LEAD TIME (DAYS)'),
-                                TextFormField(
-                                  controller: leadTimeController,
-                                  keyboardType: TextInputType.number,
-                                  decoration: _inputDecoration(icon: Icons.timer_outlined, hint: '7'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('PERFORMANCE RATING: ${rating.toStringAsFixed(1)} ⭐'),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: AppTheme.borderGrey),
-                                  ),
-                                  child: Slider(
-                                    value: rating,
-                                    min: 1.0,
-                                    max: 5.0,
-                                    divisions: 40,
-                                    activeColor: Colors.amber,
-                                    onChanged: (val) => setState(() => rating = val),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 7: Avg Lead Time
+                      _buildNumberedStepLabel(7, 'AVG LEAD TIME (DAYS)'),
+                      TextFormField(
+                        controller: leadTimeController,
+                        keyboardType: TextInputType.number,
+                        decoration: _inputDecoration(icon: Icons.timer_outlined, hint: '7'),
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 8: Performance Rating
+                      _buildNumberedStepLabel(8, 'PERFORMANCE RATING: ${rating.toStringAsFixed(1)} ⭐'),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.borderGrey),
+                        ),
+                        child: Slider(
+                          value: rating,
+                          min: 1.0,
+                          max: 5.0,
+                          divisions: 40,
+                          activeColor: Colors.amber,
+                          onChanged: (val) => setState(() => rating = val),
+                        ),
                       ),
                       const SizedBox(height: 24),
 
@@ -389,12 +339,28 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildNumberedStepLabel(int stepNum, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary),
+          ),
+        ],
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class CustomerOrderTrackScreen extends ConsumerStatefulWidget {
   const CustomerOrderTrackScreen({super.key, this.initialOrderNumber});
@@ -37,12 +38,12 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
         : null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back, color: AppTheme.dark),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -50,15 +51,15 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.local_shipping_rounded, color: Color(0xFF2563EB), size: 20),
+              child: const Icon(Icons.local_shipping_rounded, color: AppTheme.primary, size: 20),
             ),
             const SizedBox(width: 8),
             const Text(
               'SCM PRO',
-              style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppTheme.dark, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -67,8 +68,8 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: CircleAvatar(
-              backgroundColor: Colors.grey.shade300,
-              child: const Icon(Icons.person, color: Colors.black54),
+              backgroundColor: AppTheme.borderGrey,
+              child: const Icon(Icons.person, color: AppTheme.dark),
             ),
           ),
         ],
@@ -83,7 +84,7 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF2563EB), Color(0xFF1D4ED8), Color(0xFF3B82F6)],
+                  colors: [AppTheme.primary, AppTheme.primaryDark, AppTheme.blue],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -94,7 +95,7 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                 children: [
                   const Text(
                     'Track Your Shipment',
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppTheme.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   const Text(
@@ -105,12 +106,12 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.white,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.qr_code_scanner, color: Colors.grey, size: 20),
+                        const Icon(Icons.qr_code_scanner, color: AppTheme.grey, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
@@ -118,14 +119,14 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                             decoration: const InputDecoration(
                               hintText: 'Enter Tracking ID (e.g. SCM-TRK-587421)',
                               border: InputBorder.none,
-                              hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+                              hintStyle: TextStyle(fontSize: 12, color: AppTheme.grey),
                             ),
                           ),
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2563EB),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppTheme.primary,
+                            foregroundColor: AppTheme.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
@@ -165,10 +166,8 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
   }
 
   Widget _buildTrackingResult(CustomerOrderResponse order) {
-    // স্ট্যাটাসগুলোকে বড় হাতের অক্ষরে রূপান্তর করে নিশ্চিত করা
     final status = order.status.toUpperCase();
 
-    // প্রতিটি স্টেপের সঠিক কমপ্লিশন লজিক
     final bool isPendingDone = true;
     final bool isConfirmedDone = status == 'CONFIRMED' || status == 'PROCESSING' || status == 'SHIPPED' || status == 'DELIVERED';
     final bool isProcessingDone = status == 'PROCESSING' || status == 'SHIPPED' || status == 'DELIVERED';
@@ -182,9 +181,9 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: AppTheme.borderGrey),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,19 +191,19 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('ORDER REFERENCE', style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                  const Text('ORDER REFERENCE', style: TextStyle(color: AppTheme.grey, fontSize: 11, fontWeight: FontWeight.bold)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade50,
+                      color: AppTheme.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const CircleAvatar(radius: 3, backgroundColor: Colors.green),
+                        const CircleAvatar(radius: 3, backgroundColor: AppTheme.success),
                         const SizedBox(width: 6),
-                        Text(order.status, style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                        Text(order.status, style: const TextStyle(color: AppTheme.success, fontSize: 11, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -213,9 +212,9 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Text(order.orderNumber, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                  Text(order.orderNumber, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.dark)),
                   const SizedBox(width: 8),
-                  const Icon(Icons.copy, size: 16, color: Colors.blue),
+                  const Icon(Icons.copy, size: 16, color: AppTheme.primary),
                 ],
               ),
               const Divider(height: 24),
@@ -225,7 +224,7 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Recipient Customer', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const Text('Recipient Customer', style: TextStyle(color: AppTheme.grey, fontSize: 11)),
                       const SizedBox(height: 2),
                       Text(order.customerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     ],
@@ -233,12 +232,12 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text('Settlement Financial State', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const Text('Settlement Financial State', style: TextStyle(color: AppTheme.grey, fontSize: 11)),
                       const SizedBox(height: 2),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(4)),
-                        child: Text(order.paymentStatus, style: const TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
+                        decoration: BoxDecoration(color: AppTheme.warning.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                        child: Text(order.paymentStatus, style: const TextStyle(color: AppTheme.warning, fontSize: 10, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -251,11 +250,11 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Estimated Arrival Roadmap', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const Text('Estimated Arrival Roadmap', style: TextStyle(color: AppTheme.grey, fontSize: 11)),
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today, size: 14, color: Colors.blue),
+                          const Icon(Icons.calendar_today, size: 14, color: AppTheme.primary),
                           const SizedBox(width: 4),
                           Text(order.estimatedDelivery, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                         ],
@@ -265,9 +264,9 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text('Total Consignment Value', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const Text('Total Consignment Value', style: TextStyle(color: AppTheme.grey, fontSize: 11)),
                       const SizedBox(height: 2),
-                      Text('৳${order.totalAmount.toStringAsFixed(2)}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13)),
+                      Text('৳${order.totalAmount.toStringAsFixed(2)}', style: const TextStyle(color: AppTheme.success, fontWeight: FontWeight.bold, fontSize: 13)),
                     ],
                   ),
                 ],
@@ -289,15 +288,15 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
         // ── Milestone Progress Pipeline ────────────────
         const Align(
           alignment: Alignment.centerLeft,
-          child: Text('MILESTONE PROGRESS PIPELINE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+          child: Text('MILESTONE PROGRESS PIPELINE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.grey)),
         ),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: AppTheme.borderGrey),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -315,15 +314,15 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
         // ── Shipment Details Card ──────────────────────
         const Align(
           alignment: Alignment.centerLeft,
-          child: Text('SHIPMENT DETAILS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+          child: Text('SHIPMENT DETAILS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.grey)),
         ),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: AppTheme.borderGrey),
           ),
           child: Column(
             children: [
@@ -344,9 +343,9 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
       children: [
         Row(
           children: [
-            Icon(icon, size: 14, color: Colors.grey),
+            Icon(icon, size: 14, color: AppTheme.grey),
             const SizedBox(width: 4),
-            Text(title, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+            Text(title, style: const TextStyle(color: AppTheme.grey, fontSize: 10)),
           ],
         ),
         const SizedBox(height: 2),
@@ -360,11 +359,11 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
       children: [
         CircleAvatar(
           radius: 16,
-          backgroundColor: isCompleted ? Colors.green : Colors.grey.shade200,
-          child: Icon(icon, size: 16, color: isCompleted ? Colors.white : Colors.grey),
+          backgroundColor: isCompleted ? AppTheme.success : AppTheme.borderGrey,
+          child: Icon(icon, size: 16, color: isCompleted ? AppTheme.white : AppTheme.grey),
         ),
         const SizedBox(height: 6),
-        Text(title, style: TextStyle(fontSize: 10, color: isCompleted ? Colors.black87 : Colors.grey, fontWeight: FontWeight.bold)),
+        Text(title, style: TextStyle(fontSize: 10, color: isCompleted ? AppTheme.dark : AppTheme.grey, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -377,7 +376,7 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title1, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              Text(title1, style: const TextStyle(color: AppTheme.grey, fontSize: 11)),
               const SizedBox(height: 2),
               Text(val1, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
             ],
@@ -387,9 +386,9 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title2, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              Text(title2, style: const TextStyle(color: AppTheme.grey, fontSize: 11)),
               const SizedBox(height: 2),
-              Text(val2, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
+              Text(val2, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppTheme.dark)),
             ],
           ),
         ),
@@ -402,15 +401,15 @@ class _CustomerOrderTrackScreenState extends ConsumerState<CustomerOrderTrackScr
       width: double.infinity,
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppTheme.borderGrey),
       ),
       child: Column(
         children: [
-          const Icon(Icons.search_off_rounded, size: 50, color: Colors.grey),
+          const Icon(Icons.search_off_rounded, size: 50, color: AppTheme.grey),
           const SizedBox(height: 12),
-          Text(message, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(message, style: const TextStyle(color: AppTheme.grey, fontSize: 13)),
         ],
       ),
     );

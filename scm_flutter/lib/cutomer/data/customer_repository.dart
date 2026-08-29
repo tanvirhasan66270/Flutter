@@ -33,9 +33,16 @@ class CustomerRepository {
     return CustomerResponseModel.fromJson(res.data as Map<String, dynamic>);
   }
 
-  Future<CustomerResponseModel> findByUserId(int userId) async {
-    final res = await _dio.get(ApiConstants.customerByUserId(userId));
-    return CustomerResponseModel.fromJson(res.data as Map<String, dynamic>);
+  Future<CustomerResponseModel?> findByUserId(int userId) async {
+    try {
+      final res = await _dio.get(ApiConstants.customerByUserId(userId));
+      return CustomerResponseModel.fromJson(res.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return null;
+      }
+      rethrow;
+    }
   }
 
   Future<List<CustomerResponseModel>> getAll() async {

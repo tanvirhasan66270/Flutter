@@ -9,6 +9,7 @@ import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/productModel.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
 import 'dart:io';
 
@@ -121,7 +122,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
   Future<void> _loadCustomerByUserId(int userId) async {
     try {
       final cust = await ref.read(customerRepositoryProvider).findByUserId(userId);
-      if (mounted && cust.id > 0) {
+      if (mounted && cust != null && cust.id > 0) {
         setState(() {
           _customerId = cust.id;
           _loggedInCustomerName = cust.name;
@@ -402,7 +403,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
     final dueAmount = _calculateDueAmount();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       body: SafeArea(
         child: Column(
           children: [
@@ -622,7 +623,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   DropdownButtonFormField<String>(
-                                    value: _selectedEstimatedDelivery,
+                                    initialValue: _selectedEstimatedDelivery,
                                     isExpanded: true,
                                     decoration: _inputDecoration(),
                                     items: const [
@@ -704,7 +705,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                               icon: Icons.assignment_turned_in_outlined,
                               title: 'SERVICE STRATEGY MATRIX',
                               child: DropdownButtonFormField<String>(
-                                value: _selectedServiceType,
+                                initialValue: _selectedServiceType,
                                 isExpanded: true,
                                 decoration: _inputDecoration(),
                                 items: const [
@@ -725,7 +726,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                               icon: Icons.flag_outlined,
                               title: 'ORDER PRIORITY MATRIX',
                               child: DropdownButtonFormField<String>(
-                                value: _selectedPriority,
+                                initialValue: _selectedPriority,
                                 isExpanded: true,
                                 decoration: _inputDecoration(),
                                 items: const [
@@ -752,7 +753,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             DropdownButtonFormField<String>(
-                              value: _selectedPaymentMethod,
+                              initialValue: _selectedPaymentMethod,
                               isExpanded: true,
                               decoration: _inputDecoration(),
                               items: const [
@@ -945,7 +946,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                                       const Text('INVENTORY PRODUCT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
                                       const SizedBox(height: 4),
                                       DropdownButtonFormField<ProductResponseModel>(
-                                        value: _selectedProduct,
+                                        initialValue: _selectedProduct,
                                         isExpanded: true,
                                         decoration: _inputDecoration(hint: 'Search product...'),
                                         items: _products.map((p) {
@@ -1301,7 +1302,7 @@ class _CustomerOrderScreenState extends ConsumerState<CustomerOrderScreen> {
                   ],
                 ),
               ),
-              if (headerAction != null) headerAction,
+              ?headerAction,
             ],
           ),
           const SizedBox(height: 10),

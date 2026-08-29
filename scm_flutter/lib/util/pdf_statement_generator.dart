@@ -4,6 +4,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/payment_statement_model.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class PdfStatementGenerator {
   static Future<Uint8List> buildPdf({
@@ -52,7 +53,7 @@ class PdfStatementGenerator {
             pw.Container(
               width: double.infinity,
               padding: const pw.EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              color: PdfColor.fromHex('#2563EB'),
+              color: PdfColor.fromInt(AppTheme.blue.toARGB32()),
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
@@ -146,10 +147,9 @@ class PdfStatementGenerator {
                       verticalAlignment: pw.TableCellVerticalAlignment.middle,
                       children: [
                         _buildTd(index.toString(), align: pw.Alignment.center, isBold: true),
-                        _buildTd(formattedDate),
-                        _buildTdMethod(p.paymentMethod),
+                        _buildTd(formattedDate),                        _buildTdMethod(p.paymentMethod),
                         _buildTd(refNo),
-                        _buildTd('৳${p.paidAmount.toStringAsFixed(2)}', align: pw.Alignment.centerRight, isBold: true, textColor: PdfColors.green700),
+                        _buildTd('BDT ${p.paidAmount.toStringAsFixed(2)}', align: pw.Alignment.centerRight, isBold: true, textColor: PdfColors.green700),
                         _buildTdStatus(p.issueStatus),
                       ],
                     );
@@ -169,10 +169,10 @@ class PdfStatementGenerator {
                 1: const pw.FlexColumnWidth(2),
               },
               children: [
-                _buildSummaryRow('Subtotal Amount:', '৳${order.itemSubtotal.toStringAsFixed(2)}'),
-                _buildSummaryRow('Tax & Shipping Fees:', '৳${order.deliveryCharge.toStringAsFixed(2)}'),
-                _buildSummaryRow('Total Order Amount:', '৳${order.totalAmount.toStringAsFixed(2)}', isBold: true, valueColor: PdfColors.blue800, rowBg: PdfColor.fromHex('#F0F7FF')),
-                _buildSummaryRow('Total Paid Amount:', '৳${totalPaidNum.toStringAsFixed(2)}', isBold: true, valueColor: PdfColors.green700, rowBg: PdfColor.fromHex('#F0FDF4')),
+                _buildSummaryRow('Subtotal Amount:', 'BDT ${order.itemSubtotal.toStringAsFixed(2)}'),
+                _buildSummaryRow('Tax & Shipping Fees:', 'BDT ${order.deliveryCharge.toStringAsFixed(2)}'),
+                _buildSummaryRow('Total Order Amount:', 'BDT ${order.totalAmount.toStringAsFixed(2)}', isBold: true, valueColor: PdfColors.blue800, rowBg: PdfColor.fromHex('#F0F7FF')),
+                _buildSummaryRow('Total Paid Amount:', 'BDT ${totalPaidNum.toStringAsFixed(2)}', isBold: true, valueColor: PdfColors.green700, rowBg: PdfColor.fromHex('#F0FDF4')),
               ],
             ),
             pw.SizedBox(height: 12),
@@ -196,7 +196,7 @@ class PdfStatementGenerator {
                     ),
                   ),
                   pw.Text(
-                    '৳${totalDueNum.toStringAsFixed(2)}',
+                    'BDT ${totalDueNum.toStringAsFixed(2)}',
                     style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColor.fromHex('#991B1B'),
@@ -239,7 +239,7 @@ class PdfStatementGenerator {
             // Footer
             pw.Center(
               child: pw.Text(
-                'Official System Generated Statement — Supply Chain Management Engine',
+                'Official System Generated Statement -- Supply Chain Management Engine',
                 style: const pw.TextStyle(color: PdfColors.grey600, fontSize: 9),
               ),
             ),

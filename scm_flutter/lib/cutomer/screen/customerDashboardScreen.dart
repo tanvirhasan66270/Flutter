@@ -6,6 +6,7 @@ import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/system/notification/notification_provider.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
 import 'package:scm_flutter/util/pdf_invoice_generator.dart';
 
@@ -62,24 +63,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
   }
 
   Color _getStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case OrderStatus.pending:
-        return Colors.orange;
-      case OrderStatus.confirmed:
-        return Colors.blue;
-      case OrderStatus.processing:
-        return Colors.purple;
-      case OrderStatus.shipped:
-        return Colors.indigo;
-      case OrderStatus.outForDelivery:
-        return Colors.deepOrange;
-      case OrderStatus.delivered:
-        return Colors.green;
-      case OrderStatus.cancelled:
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
+    return AppTheme.statusColor(status);
   }
 
   @override
@@ -109,24 +93,24 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.white,
         elevation: 0,
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.inventory_2_rounded, color: Color(0xFF2563EB), size: 22),
+              child: const Icon(Icons.inventory_2_rounded, color: AppTheme.primary, size: 22),
             ),
             const SizedBox(width: 8),
             const Text(
               'SCM ENTERPRISE',
-              style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppTheme.dark, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -142,10 +126,10 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                   final String profileUrl = _resolveProfileImageUrl(rawImage);
 
                   return CircleAvatar(
-                    backgroundColor: const Color(0xFF2563EB),
+                    backgroundColor: AppTheme.primary,
                     backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
                     child: profileUrl.isEmpty
-                        ? Text(userInitial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                        ? Text(userInitial, style: const TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold))
                         : null,
                   );
                 },
@@ -153,7 +137,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.redAccent),
+            icon: const Icon(Icons.logout, color: AppTheme.danger),
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
@@ -164,7 +148,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                     TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Logout', style: TextStyle(color: Colors.red)),
+                      child: const Text('Logout', style: TextStyle(color: AppTheme.danger)),
                     ),
                   ],
                 ),
@@ -200,7 +184,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF2563EB), Color(0xFF1D4ED8), Color(0xFF3B82F6)],
+                    colors: [AppTheme.primary, AppTheme.primaryDark, AppTheme.blue],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -217,7 +201,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                               Flexible(
                                 child: Text(
                                   'Welcome back, $userName ',
-                                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(color: AppTheme.white, fontSize: 18, fontWeight: FontWeight.bold),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -233,15 +217,15 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: AppTheme.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
-                                CircleAvatar(radius: 3, backgroundColor: Colors.greenAccent),
+                                CircleAvatar(radius: 3, backgroundColor: AppTheme.success),
                                 SizedBox(width: 6),
-                                Text('Live System Connected', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                                Text('Live System Connected', style: TextStyle(color: AppTheme.white, fontSize: 11, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -261,7 +245,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)]),
+                        gradient: const LinearGradient(colors: [AppTheme.primaryDark, AppTheme.blue]),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -277,7 +261,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                           const SizedBox(height: 8),
                           Text(
                             '৳${walletBalance.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: AppTheme.white, fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -288,24 +272,24 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.pink.withValues(alpha: 0.2)),
+                        border: Border.all(color: AppTheme.danger.withValues(alpha: 0.2)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: const [
-                              Icon(Icons.calendar_today_outlined, color: Colors.pink, size: 18),
+                              Icon(Icons.calendar_today_outlined, color: AppTheme.danger, size: 18),
                               SizedBox(width: 6),
-                              Text('Due Payments', style: TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                              Text('Due Payments', style: TextStyle(color: AppTheme.danger, fontSize: 12, fontWeight: FontWeight.bold)),
                             ],
                           ),
                           const SizedBox(height: 8),
                           Text(
                             '৳${dueAmountTotal.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.black87, fontSize: 20, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: AppTheme.dark, fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -318,16 +302,16 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
               // ── Order Metrics Grid ──────────────────────
               orderSummaryAsync.when(
                 loading: () => const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator())),
-                error: (err, _) => Center(child: Text('Error loading stats: $err', style: const TextStyle(color: Colors.red))),
+                error: (err, _) => Center(child: Text('Error loading stats: $err', style: const TextStyle(color: AppTheme.danger))),
                 data: (summary) => Column(
                   children: [
                     Row(
                       children: [
-                        _buildMetricCard('Total Orders', '${summary.total}', 'All-time orders', Colors.blue, Icons.shopping_bag_outlined),
+                        _buildMetricCard('Total Orders', '${summary.total}', 'All-time orders', AppTheme.primary, Icons.shopping_bag_outlined),
                         const SizedBox(width: 8),
-                        _buildMetricCard('Active Orders', '${summary.active}', '${summary.active} Processing', Colors.green, Icons.inventory_2_outlined),
+                        _buildMetricCard('Active Orders', '${summary.active}', '${summary.active} Processing', AppTheme.success, Icons.inventory_2_outlined),
                         const SizedBox(width: 8),
-                        _buildMetricCard('Delivered', '${summary.completed}', 'Successfully delivered', Colors.teal, Icons.check_circle_outline),
+                        _buildMetricCard('Delivered', '${summary.completed}', 'Successfully delivered', AppTheme.success, Icons.check_circle_outline),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -336,16 +320,16 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                            decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(12)),
                             child: Row(
                               children: [
-                                const Icon(Icons.hourglass_empty_rounded, color: Colors.orange, size: 28),
+                                const Icon(Icons.hourglass_empty_rounded, color: AppTheme.warning, size: 28),
                                 const SizedBox(width: 12),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text('${summary.pending}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                    const Text('Pending Orders', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                                    const Text('Pending Orders', style: TextStyle(color: AppTheme.grey, fontSize: 11)),
                                   ],
                                 ),
                               ],
@@ -356,16 +340,16 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                            decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(12)),
                             child: Row(
                               children: [
-                                const Icon(Icons.cancel_outlined, color: Colors.red, size: 28),
+                                const Icon(Icons.cancel_outlined, color: AppTheme.danger, size: 28),
                                 const SizedBox(width: 12),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text('${summary.cancelled}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                    const Text('Cancelled Orders', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                                    const Text('Cancelled Orders', style: TextStyle(color: AppTheme.grey, fontSize: 11)),
                                   ],
                                 ),
                               ],
@@ -386,7 +370,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                   const Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pushNamed('/products'),
-                    child: const Text('View All →', style: TextStyle(color: Color(0xFF2563EB), fontSize: 12, fontWeight: FontWeight.bold)),
+                    child: const Text('View All →', style: TextStyle(color: AppTheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -433,7 +417,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                   const Text('Active Order Pipeline', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pushNamed('/customer-orders'),
-                    child: const Text('View All →', style: TextStyle(color: Color(0xFF2563EB), fontSize: 12, fontWeight: FontWeight.bold)),
+                    child: const Text('View All →', style: TextStyle(color: AppTheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -442,14 +426,14 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                 loading: () => Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(16)),
                   child: const Center(child: CircularProgressIndicator()),
                 ),
                 error: (err, _) => Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                  child: Center(child: Text('Error loading orders: $err', style: const TextStyle(color: Colors.red))),
+                  decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(16)),
+                  child: Center(child: Text('Error loading orders: $err', style: const TextStyle(color: AppTheme.danger))),
                 ),
                 data: (summary) {
                   final recentOrders = summary.recent.take(5).toList();
@@ -457,12 +441,12 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                     return Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                      decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(16)),
                       child: Column(
                         children: const [
-                          Icon(Icons.inbox_rounded, color: Colors.blueAccent, size: 48),
+                          Icon(Icons.inbox_rounded, color: AppTheme.primary, size: 48),
                           SizedBox(height: 8),
-                          Text('No active order records found.', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                          Text('No active order records found.', style: TextStyle(color: AppTheme.grey, fontSize: 13)),
                         ],
                       ),
                     );
@@ -478,7 +462,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.grey.shade200),
+                          side: const BorderSide(color: AppTheme.borderGrey),
                         ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -512,19 +496,19 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Items: ${order.lineItems.length} • Total: ৳${order.totalAmount.toStringAsFixed(2)}',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                                  'Items: ${order.lineItems.length} | Total: ৳${order.totalAmount.toStringAsFixed(2)}',
+                                  style: const TextStyle(fontSize: 12, color: AppTheme.grey),
                                 ),
                                 Text(
                                   order.createdAt.length >= 10 ? order.createdAt.substring(0, 10) : order.createdAt,
-                                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.grey),
                                 ),
                               ],
                             ),
                           ),
                           trailing: IconButton(
                             tooltip: 'View Order PDF',
-                            icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF1E40AF), size: 22),
+                            icon: const Icon(Icons.picture_as_pdf, color: AppTheme.primary, size: 22),
                             onPressed: () async {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text('Generating PDF for ${order.orderNumber}...'), duration: const Duration(seconds: 1)),
@@ -553,7 +537,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                   const Text('Recommended for You', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   GestureDetector(
                     onTap: () => Navigator.of(context).pushNamed('/products'),
-                    child: const Text('View All →', style: TextStyle(color: Color(0xFF2563EB), fontSize: 12, fontWeight: FontWeight.bold)),
+                    child: const Text('View All →', style: TextStyle(color: AppTheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -566,14 +550,14 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                 error: (err, _) => Container(
                   height: 100,
                   alignment: Alignment.center,
-                  child: Text('Unable to load products: $err', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  child: Text('Unable to load products: $err', style: const TextStyle(color: AppTheme.grey, fontSize: 12)),
                 ),
                 data: (products) {
                   if (products.isEmpty) {
                     return Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                      child: const Center(child: Text('No recommended products available.', style: TextStyle(color: Colors.grey))),
+                      decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(12)),
+                      child: const Center(child: Text('No recommended products available.', style: TextStyle(color: AppTheme.grey))),
                     );
                   }
 
@@ -599,9 +583,9 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                             margin: const EdgeInsets.only(right: 12),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppTheme.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey.shade200),
+                              border: Border.all(color: AppTheme.borderGrey),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,7 +593,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                                 Container(
                                   height: 90,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
+                                    color: AppTheme.light,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Builder(
@@ -620,9 +604,9 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                                             ? Image.network(
                                                 imageUrl,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.inventory_2_outlined, color: Colors.grey, size: 40),
+                                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.inventory_2_outlined, color: AppTheme.grey, size: 40),
                                               )
-                                            : const Icon(Icons.inventory_2_outlined, color: Colors.grey, size: 40),
+                                            : const Icon(Icons.inventory_2_outlined, color: AppTheme.grey, size: 40),
                                       );
                                     },
                                   ),
@@ -637,20 +621,20 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                                 const Spacer(),
                                 Text(
                                   '৳${item.sellingPrice.toStringAsFixed(2)}',
-                                  style: const TextStyle(color: Color(0xFF2563EB), fontSize: 13, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     Icon(
                                       inStock ? Icons.check_circle : Icons.remove_circle_outline,
-                                      color: inStock ? Colors.green : Colors.red,
+                                      color: inStock ? AppTheme.success : AppTheme.danger,
                                       size: 12,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       inStock ? 'In Stock (${item.quantity})' : 'Out of Stock',
-                                      style: TextStyle(fontSize: 10, color: inStock ? Colors.green : Colors.red),
+                                      style: TextStyle(fontSize: 10, color: inStock ? AppTheme.success : AppTheme.danger),
                                     ),
                                   ],
                                 ),
@@ -660,8 +644,8 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
                                   height: 28,
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF2563EB),
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: AppTheme.primary,
+                                      foregroundColor: AppTheme.white,
                                       padding: EdgeInsets.zero,
                                       textStyle: const TextStyle(fontSize: 11),
                                     ),
@@ -687,8 +671,8 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: const Color(0xFF2563EB),
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppTheme.primary,
+        unselectedItemColor: AppTheme.grey,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() => _currentIndex = index);
@@ -717,14 +701,14 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 20),
             const SizedBox(height: 8),
             Text(count, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(title, style: const TextStyle(fontSize: 11, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(title, style: const TextStyle(fontSize: 11, color: AppTheme.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 4),
             Text(subtitle, style: TextStyle(fontSize: 9, color: color, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
@@ -738,16 +722,16 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(12)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: const Color(0xFF2563EB), size: 22),
+            Icon(icon, color: AppTheme.primary, size: 22),
             const SizedBox(height: 6),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.black87),
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.dark),
             ),
           ],
         ),

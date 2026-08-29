@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
 import 'package:scm_flutter/entity/purchase_requisition_model.dart';
-import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/procourment/data/purchase_requisition_repository.dart';
 
 final purchaseRequisitionRepositoryProvider = Provider<PurchaseRequisitionRepository>((ref) {

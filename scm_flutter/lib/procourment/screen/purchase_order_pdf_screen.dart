@@ -210,15 +210,15 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                           pw.SizedBox(height: 5),
                           pw.Row(
                             children: [
-                              pw.Text('🏢  ', style: const pw.TextStyle(fontSize: 7)),
+                              pw.Text('[HQ]  ', style: const pw.TextStyle(fontSize: 7)),
                               pw.Text('Corporate SCM Tower, Supply Terminal District', style: pw.TextStyle(fontSize: 7.5, color: textMuted)),
                             ],
                           ),
                           pw.SizedBox(height: 2),
                           pw.Row(
                             children: [
-                              pw.Text('✉️  ', style: const pw.TextStyle(fontSize: 7)),
-                              pw.Text('Email: procurement@scm-enterprise.com  |  📞  Line: +1 (800) 555-SCM1', style: pw.TextStyle(fontSize: 7.5, color: textMuted)),
+                              pw.Text('[EMAIL]  ', style: const pw.TextStyle(fontSize: 7)),
+                              pw.Text('Email: procurement@scm-enterprise.com  |  [TEL] Line: +1 (800) 555-SCM1', style: pw.TextStyle(fontSize: 7.5, color: textMuted)),
                             ],
                           ),
                         ],
@@ -286,6 +286,23 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
+                              pw.SizedBox(height: 6),
+                              pw.Center(
+                                child: pw.Container(
+                                  padding: const pw.EdgeInsets.all(3),
+                                  decoration: pw.BoxDecoration(
+                                    color: PdfColors.white,
+                                    border: pw.Border.all(color: borderGrey),
+                                    borderRadius: pw.BorderRadius.circular(4),
+                                  ),
+                                  child: pw.BarcodeWidget(
+                                    barcode: pw.Barcode.qrCode(),
+                                    data: 'PO:$poNum|VENDOR:$vendorName|VAL:${po.totalAmount}|STATUS:$poStatus',
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -303,7 +320,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                   pw.Expanded(child: pw.Container(height: 1.5, color: darkBlueHeader)),
                   pw.Padding(
                     padding: const pw.EdgeInsets.symmetric(horizontal: 6),
-                    child: pw.Text('◆', style: pw.TextStyle(fontSize: 8, color: darkBlueHeader)),
+                    child: pw.Text('+', style: pw.TextStyle(fontSize: 8, color: darkBlueHeader)),
                   ),
                   pw.Expanded(child: pw.Container(height: 1.5, color: darkBlueHeader)),
                 ],
@@ -333,7 +350,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                                 width: 22,
                                 height: 22,
                                 decoration: pw.BoxDecoration(color: accentBlue, shape: pw.BoxShape.circle),
-                                child: pw.Center(child: pw.Text('🏢', style: const pw.TextStyle(fontSize: 9))),
+                                child: pw.Center(child: pw.Text('V', style: const pw.TextStyle(fontSize: 9, color: PdfColors.white))),
                               ),
                               pw.SizedBox(width: 6),
                               pw.Text(
@@ -349,11 +366,11 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                           pw.SizedBox(height: 6),
                           pw.Container(height: 0.8, color: borderGrey),
                           pw.SizedBox(height: 6),
-                          _buildBulletRow('🎯', 'Quotation Bid Ref: #$qtnRef', textDark),
+                          _buildBulletRow('>', 'Quotation Bid Ref: #$qtnRef', textDark),
                           pw.SizedBox(height: 3),
-                          _buildBulletRow('⏱️', 'Committed Lead Time: $leadTimeDays Days', textDark),
+                          _buildBulletRow('>', 'Committed Lead Time: $leadTimeDays Days', textDark),
                           pw.SizedBox(height: 3),
-                          _buildBulletRow('📅', 'Valid Until: $validUntil', textDark),
+                          _buildBulletRow('>', 'Valid Until: $validUntil', textDark),
                         ],
                       ),
                     ),
@@ -379,7 +396,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                                 width: 22,
                                 height: 22,
                                 decoration: pw.BoxDecoration(color: tealGreen, shape: pw.BoxShape.circle),
-                                child: pw.Center(child: pw.Text('🚚', style: const pw.TextStyle(fontSize: 9))),
+                                child: pw.Center(child: pw.Text('D', style: const pw.TextStyle(fontSize: 9, color: PdfColors.white))),
                               ),
                               pw.SizedBox(width: 6),
                               pw.Text(
@@ -395,11 +412,11 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                           pw.SizedBox(height: 6),
                           pw.Container(height: 0.8, color: borderGrey),
                           pw.SizedBox(height: 6),
-                          _buildBulletRow('🔄', 'Linked Requisition: #PRQ-$reqIdStr ($urgencyStr Priority)', textDark),
+                          _buildBulletRow('>', 'Linked Requisition: #PRQ-$reqIdStr ($urgencyStr Priority)', textDark),
                           pw.SizedBox(height: 3),
-                          _buildBulletRow('👤', 'Approved By: $approvedByStr', textDark),
+                          _buildBulletRow('>', 'Approved By: $approvedByStr', textDark),
                           pw.SizedBox(height: 3),
-                          _buildBulletRow('📅', 'Req Date: $reqDateStr', textDark),
+                          _buildBulletRow('>', 'Req Date: $reqDateStr', textDark),
                         ],
                       ),
                     ),
@@ -431,7 +448,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                             width: 24,
                             height: 24,
                             decoration: pw.BoxDecoration(color: purpleTheme, shape: pw.BoxShape.circle),
-                            child: pw.Center(child: pw.Text('📋', style: const pw.TextStyle(fontSize: 10))),
+                            child: pw.Center(child: pw.Text('i', style: const pw.TextStyle(fontSize: 10, color: PdfColors.white))),
                           ),
                           pw.SizedBox(width: 8),
                           pw.Expanded(
@@ -482,7 +499,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                               shape: pw.BoxShape.circle,
                               border: pw.Border.all(color: purpleTheme, width: 1.5),
                             ),
-                            child: pw.Center(child: pw.Text('🛡️', style: const pw.TextStyle(fontSize: 9))),
+                            child: pw.Center(child: pw.Text('W', style: pw.TextStyle(fontSize: 9, color: purpleTheme))),
                           ),
                           pw.SizedBox(width: 6),
                           pw.Column(
@@ -505,7 +522,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
               // ── 4. ORDER ITEM SPECIFICATION MATRIX (TABLE) ────────────
               pw.Row(
                 children: [
-                  pw.Text('🛡️  ', style: const pw.TextStyle(fontSize: 9)),
+                  pw.Text('[ITEMS]  ', style: const pw.TextStyle(fontSize: 9)),
                   pw.Text(
                     'ORDER ITEM SPECIFICATION MATRIX',
                     style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold, color: darkBlueHeader),
@@ -582,7 +599,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                         children: [
                           pw.Row(
                             children: [
-                              pw.Text('⚙️  ', style: const pw.TextStyle(fontSize: 9)),
+                              pw.Text('[TERMS]  ', style: const pw.TextStyle(fontSize: 9)),
                               pw.Text(
                                 'TERMS & SPECIAL DIRECTIVES',
                                 style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold, color: darkBlueHeader),
@@ -622,7 +639,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                                 width: 22,
                                 height: 22,
                                 decoration: pw.BoxDecoration(color: PdfColors.white, shape: pw.BoxShape.circle),
-                                child: pw.Center(child: pw.Text('💰', style: const pw.TextStyle(fontSize: 9))),
+                                child: pw.Center(child: pw.Text('\$', style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: darkBlueHeader))),
                               ),
                               pw.SizedBox(width: 6),
                               pw.Expanded(
@@ -663,7 +680,7 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                 child: pw.Column(
                   children: [
                     pw.Text(
-                      '★   Thank You for Your Business!   ★',
+                      '--  Thank You for Your Business!  --',
                       style: pw.TextStyle(
                         fontSize: 10.5,
                         fontWeight: pw.FontWeight.bold,
@@ -693,13 +710,13 @@ class PurchaseOrderPDFScreen extends ConsumerWidget {
                 child: pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
                   children: [
-                    _buildFooterBadge('✔ Trusted Partner'),
+                    _buildFooterBadge('Trusted Partner'),
                     pw.Text('|', style: pw.TextStyle(color: PdfColors.white, fontSize: 8)),
-                    _buildFooterBadge('✔ Quality Assured'),
+                    _buildFooterBadge('Quality Assured'),
                     pw.Text('|', style: pw.TextStyle(color: PdfColors.white, fontSize: 8)),
-                    _buildFooterBadge('🚚 On-Time Delivery'),
+                    _buildFooterBadge('On-Time Delivery'),
                     pw.Text('|', style: pw.TextStyle(color: PdfColors.white, fontSize: 8)),
-                    _buildFooterBadge('🔒 Secure & Compliant'),
+                    _buildFooterBadge('Secure & Compliant'),
                   ],
                 ),
               ),

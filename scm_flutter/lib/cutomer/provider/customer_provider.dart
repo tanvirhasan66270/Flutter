@@ -16,14 +16,23 @@ final customerOrderRepositoryProvider = Provider<CustomerOrderRepository>((ref) 
   return CustomerOrderRepository(ref.watch(apiClientProvider));
 });
 
+final customerListProvider = FutureProvider.autoDispose<List<CustomerResponseModel>>((ref) async {
+  final repo = ref.watch(customerRepositoryProvider);
+  return await repo.getAll();
+});
+
 /// The logged-in customer's profile — keyed off the authenticated user's
 /// `userId`, mirroring `customerService.findByUserId(this.userId)` in
 /// customerdashboard.ts / customer-profile-component.ts.
 final currentCustomerProvider =
 FutureProvider.autoDispose<CustomerResponseModel?>((ref) async {
   final user = ref.watch(currentUserProvider);
-  if (user == null) return null;
-  return ref.watch(customerRepositoryProvider).findByUserId(user.userId);
+  if (user == null || user.role.toUpperCase() != 'CUSTOMER') return null;
+  try {
+    return await ref.watch(customerRepositoryProvider).findByUserId(user.userId);
+  } catch (_) {
+    return null;
+  }
 });
 
 /// Dashboard summary (stats + recent orders) for the current customer.
@@ -67,9 +76,13 @@ FutureProvider.autoDispose<({int total, int pending, int active, int completed, 
       );
     });
 
-/// Full order list for "My Orders" screen.
+/// Full order list for "My Orders" screen or staff Directory view.
 final myCustomerOrdersProvider =
 FutureProvider.autoDispose<List<CustomerOrderResponse>>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user != null && user.role.toUpperCase() != 'CUSTOMER') {
+    return ref.watch(customerOrderRepositoryProvider).findAll();
+  }
   final customer = await ref.watch(currentCustomerProvider.future);
   if (customer?.id == null) return <CustomerOrderResponse>[];
   return ref.watch(customerOrderRepositoryProvider).getByCustomerEmail();

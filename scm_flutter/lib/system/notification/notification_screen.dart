@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/system/notification/notification_provider.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class NotificationScreen extends ConsumerWidget {
   const NotificationScreen({super.key});
@@ -54,7 +55,7 @@ class NotificationScreen extends ConsumerWidget {
               return ListTile(
                 tileColor: isRead ? Colors.transparent : Colors.blue.withValues(alpha: 0.05),
                 leading: CircleAvatar(
-                  backgroundColor: isRead ? Colors.grey.shade300 : const Color(0xFF2563EB),
+                  backgroundColor: isRead ? AppTheme.borderGrey : AppTheme.primary,
                   child: Icon(
                     isRead ? Icons.notifications_none : Icons.notifications_active,
                     color: isRead ? Colors.grey.shade700 : Colors.white,

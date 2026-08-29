@@ -5,6 +5,7 @@ import 'package:scm_flutter/route/appRoute.dart';
 
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MyApp()));
 }
 

@@ -197,11 +197,11 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // TARGET PURCHASE ORDER VECTOR
-                      _buildSectionLabel('TARGET PURCHASE ORDER VECTOR *'),
+                      // Step 1: TARGET PURCHASE ORDER VECTOR
+                      _buildNumberedStepLabel(1, 'TARGET PURCHASE ORDER VECTOR *'),
                       DropdownButtonFormField<int>(
                         isExpanded: true,
-                        value: poId == 0 ? null : poId,
+                        initialValue: poId == 0 ? null : poId,
                         hint: const Text('-- Link Master Purchase Order --', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
                         decoration: _inputDecoration(),
                         items: posAvailable.map((po) {
@@ -231,8 +231,8 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // ASSIGNED SUPPLIER VENDOR
-                      _buildSectionLabel('ASSIGNED SUPPLIER VENDOR *'),
+                      // Step 2: ASSIGNED SUPPLIER VENDOR
+                      _buildNumberedStepLabel(2, 'ASSIGNED SUPPLIER VENDOR *'),
                       if (isSupplierRole)
                         TextFormField(
                           readOnly: true,
@@ -243,7 +243,7 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                       else
                         DropdownButtonFormField<int>(
                           isExpanded: true,
-                          value: supplierId == 0 ? null : supplierId,
+                          initialValue: supplierId == 0 ? null : supplierId,
                           hint: const Text('-- Map Dispatch Supplier Node --', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
                           decoration: _inputDecoration(),
                           items: suppliers.map((sup) {
@@ -261,110 +261,58 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                         ),
                       const SizedBox(height: 14),
 
-                      // ROW: VEHICLE FLEET & CAPTAIN LICENSE
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('VEHICLE FLEET PLATE NO *'),
-                                TextFormField(
-                                  controller: _vehicleController,
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration().copyWith(hintText: 'e.g. DHAKA-METRO-T-1122'),
-                                  onChanged: (val) => vehicleNumber = val,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('CAPTAIN LICENSE REG NO *'),
-                                TextFormField(
-                                  controller: _captainController,
-                                  style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration().copyWith(hintText: 'e.g. BRTA-DL-99228'),
-                                  onChanged: (val) => captainRegistrationNumber = val,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 3: VEHICLE FLEET PLATE NO
+                      _buildNumberedStepLabel(3, 'VEHICLE FLEET PLATE NO *'),
+                      TextFormField(
+                        controller: _vehicleController,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                        decoration: _inputDecoration().copyWith(hintText: 'e.g. DHAKA-METRO-T-1122'),
+                        onChanged: (val) => vehicleNumber = val,
                       ),
                       const SizedBox(height: 14),
 
-                      // ROW: ORIGIN, QUANTITY & COST
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('FREIGHT SOURCING ORIGIN *'),
-                                TextFormField(
-                                  controller: _originController,
-                                  style: const TextStyle(fontSize: 12),
-                                  decoration: _inputDecoration().copyWith(hintText: 'e.g. Chittagong Port Yard'),
-                                  onChanged: (val) => origin = val,
-                                ),
-                              ],
-                            ),
+                      // Step 4: CAPTAIN LICENSE REG NO
+                      _buildNumberedStepLabel(4, 'CAPTAIN LICENSE REG NO *'),
+                      TextFormField(
+                        controller: _captainController,
+                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                        decoration: _inputDecoration().copyWith(hintText: 'e.g. BRTA-DL-99228'),
+                        onChanged: (val) => captainRegistrationNumber = val,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 5: FREIGHT SOURCING ORIGIN
+                      _buildNumberedStepLabel(5, 'FREIGHT SOURCING ORIGIN *'),
+                      TextFormField(
+                        controller: _originController,
+                        style: const TextStyle(fontSize: 12),
+                        decoration: _inputDecoration().copyWith(hintText: 'e.g. Chittagong Port Yard'),
+                        onChanged: (val) => origin = val,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 6: SHIPMENT QTY
+                      _buildNumberedStepLabel(6, 'SHIPMENT QTY *'),
+                      TextFormField(
+                        controller: _quantityController,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                          color: qtyInvalid ? Colors.red : Colors.black87,
+                        ),
+                        decoration: _inputDecoration().copyWith(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: qtyInvalid ? Colors.red : AppTheme.borderGrey),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('SHIPMENT QTY *'),
-                                TextFormField(
-                                  controller: _quantityController,
-                                  keyboardType: TextInputType.number,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'monospace',
-                                    color: qtyInvalid ? Colors.red : Colors.black87,
-                                  ),
-                                  decoration: _inputDecoration().copyWith(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide: BorderSide(color: qtyInvalid ? Colors.red : AppTheme.borderGrey),
-                                    ),
-                                  ),
-                                  onChanged: (val) {
-                                    setState(() {
-                                      shipmentQuantity = int.tryParse(val) ?? 0;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('EST COST (\$) *'),
-                                TextFormField(
-                                  controller: _costController,
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration(),
-                                  onChanged: (val) => transportCost = double.tryParse(val) ?? 0.0,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            shipmentQuantity = int.tryParse(val) ?? 0;
+                          });
+                        },
                       ),
                       if (qtyInvalid) ...[
                         const SizedBox(height: 4),
@@ -375,8 +323,19 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                       ],
                       const SizedBox(height: 14),
 
-                      // TARGET EXPECTED DELIVERY DATE
-                      _buildSectionLabel('TARGET EXPECTED DELIVERY DATE *'),
+                      // Step 7: EST COST ($)
+                      _buildNumberedStepLabel(7, 'EST COST (\$) *'),
+                      TextFormField(
+                        controller: _costController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                        decoration: _inputDecoration(),
+                        onChanged: (val) => transportCost = double.tryParse(val) ?? 0.0,
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Step 8: TARGET EXPECTED DELIVERY DATE
+                      _buildNumberedStepLabel(8, 'TARGET EXPECTED DELIVERY DATE *'),
                       TextFormField(
                         controller: _deliveryController,
                         style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
@@ -388,8 +347,8 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // ASSIGNED CONTROLLER EMAIL
-                      _buildSectionLabel('ASSIGNED CONTROLLER EMAIL'),
+                      // Step 9: ASSIGNED CONTROLLER EMAIL
+                      _buildNumberedStepLabel(9, 'ASSIGNED CONTROLLER EMAIL'),
                       TextFormField(
                         readOnly: true,
                         initialValue: assignedByEmail,
@@ -398,8 +357,8 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // CONSIGNMENT DESTINATION ADDRESS
-                      _buildSectionLabel('CONSIGNMENT TARGET DESTINATION ADDRESS *'),
+                      // Step 10: CONSIGNMENT DESTINATION ADDRESS
+                      _buildNumberedStepLabel(10, 'CONSIGNMENT TARGET DESTINATION ADDRESS *'),
                       TextFormField(
                         controller: _addressController,
                         maxLines: 2,
@@ -409,8 +368,8 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
                       ),
                       const SizedBox(height: 14),
 
-                      // PROOF OF DELIVERY FILE ATTACHMENT
-                      _buildSectionLabel('PROOF OF DELIVERY (PDF/IMAGE POD)'),
+                      // Proof of Delivery File Attachment
+                      _buildNumberedStepLabel(11, 'PROOF OF DELIVERY (PDF/IMAGE POD)'),
                       InkWell(
                         onTap: _pickAttachment,
                         child: Container(
@@ -537,12 +496,28 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildNumberedStepLabel(int stepNum, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary, letterSpacing: 0.3),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary, letterSpacing: 0.3),
+          ),
+        ],
       ),
     );
   }

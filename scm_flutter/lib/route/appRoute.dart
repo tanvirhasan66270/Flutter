@@ -11,12 +11,31 @@ import 'package:scm_flutter/cutomer/screen/customer_order_data_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_order_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_oredr_track_page.dart';
 import 'package:scm_flutter/cutomer/screen/customer_profile_screen.dart';
+import 'package:scm_flutter/driver/screen/driver_dashboard_screen.dart';
+import 'package:scm_flutter/driver/screen/driver_profile_screen.dart';
 import 'package:scm_flutter/entity/productModel.dart';
 import 'package:scm_flutter/entity/purchase_requisition_model.dart';
 import 'package:scm_flutter/entity/quatation_model.dart';
 import 'package:scm_flutter/entity/shipment_model.dart';
-import 'package:scm_flutter/invoice/invoice_portal_screen.dart';
+import 'package:scm_flutter/entity/qc_inspaction_model.dart';
+import 'package:scm_flutter/commercial_officer/screen/invoice_portal_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_data_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_form_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_pdf_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/customer_payment_data_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/customer_payment_pdf_screen.dart';
+import 'package:scm_flutter/entity/invoiceModel.dart';
+import 'package:scm_flutter/entity/payment_statement_model.dart';
+import 'package:scm_flutter/commercial_officer/screen/commercial_dashboard_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/lc_bank_data_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/lc_bank_form_screen.dart';
+import 'package:scm_flutter/entity/lc_bank.dart';
+import 'package:scm_flutter/commercial_officer/screen/letter_of_credit_form_screen.dart';
+import 'package:scm_flutter/commercial_officer/screen/letter_of_credit_data_screen.dart';
+import 'package:scm_flutter/cutomer/screen/customer_order_pdf_screen.dart';
+import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/procourment/screen/procourmet_dashboard_screen.dart';
+import 'package:scm_flutter/procourment/screen/procurement_profile_screen.dart';
 import 'package:scm_flutter/procourment/screen/purchase-order_screen.dart';
 import 'package:scm_flutter/procourment/screen/po_line_item_data_screen.dart';
 import 'package:scm_flutter/procourment/screen/purchase_order_data_screen.dart';
@@ -39,6 +58,29 @@ import 'package:scm_flutter/suppplier/screen/supplier_dashboard_screen.dart';
 import 'package:scm_flutter/suppplier/screen/supplier_form_screen.dart';
 import 'package:scm_flutter/system/massage/chat_workspace_screen.dart';
 import 'package:scm_flutter/system/notification/notification_screen.dart';
+import 'package:scm_flutter/qc_inspactor/screen/qc_dashboard_screen.dart';
+import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
+import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_pdf_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/logistics_officer_dashboard_screen.dart';
+import 'package:scm_flutter/entity/inventory_model.dart';
+import 'package:scm_flutter/logistics_officer/screen/inventory_data_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/inventory_form_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/inventory_data_pdf_screen.dart';
+import 'package:scm_flutter/entity/stock_movement.dart';
+import 'package:scm_flutter/logistics_officer/screen/stock_movement_data_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/stock_movement_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/stock_movement_pdf_screen.dart';
+import 'package:scm_flutter/entity/grn_model.dart';
+import 'package:scm_flutter/logistics_officer/screen/good_received_note_data_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/good_received_note_form_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/good_received_note_pdf_screen.dart';
+import 'package:scm_flutter/entity/delivery_trip_model.dart';
+import 'package:scm_flutter/logistics_officer/screen/delivery_trip_data_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/delivery_trip_form_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/delivery_trip_pdf_screen.dart';
+import 'package:scm_flutter/entity/vehicle_model.dart';
+import 'package:scm_flutter/logistics_officer/screen/vehicle_data_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/vehicle_form_screen.dart';
 
 /// App routing & role redirection manager.
 class AppRouter {
@@ -138,9 +180,57 @@ class AppRouter {
           settings: settings,
         );
 
+      case '/procurement-profile':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: ProcurementProfileScreen()),
+          settings: settings,
+        );
+
+      case '/driver-dashboard':
+      case '/driver':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: DriverDashboardScreen()),
+          settings: settings,
+        );
+
+      case '/driver-profile':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: DriverProfileScreen()),
+          settings: settings,
+        );
+
       case '/notifications':
         return MaterialPageRoute(
           builder: (_) => const _RequireAuth(child: NotificationScreen()),
+          settings: settings,
+        );
+
+      // ── Commercial Routes ──────────────────────────
+      case '/commercial-dashboard':
+      case '/commercial':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: CommercialDashboardScreen()),
+          settings: settings,
+        );
+
+      case '/lcbank':
+      case '/lc-bank-data':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: LCBankDataScreen()),
+          settings: settings,
+        );
+
+      case '/letter-of-credit':
+      case '/letter-of-credit-data':
+      case '/lc-registry':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: LetterOfCreditDataScreen()),
+          settings: settings,
+        );
+
+      case '/letter-of-credit-create':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: LetterOfCreditFormScreen()),
           settings: settings,
         );
 
@@ -260,6 +350,184 @@ class AppRouter {
           settings: settings,
         );
 
+      case '/qc-dashboard':
+      case '/qc-inspector-dashboard':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: QCDashboardScreen()),
+          settings: settings,
+        );
+
+      case '/qc-inspections':
+      case '/qc-inspection-data':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: QCInspectionDataScreen()),
+          settings: settings,
+        );
+
+      case '/qc-inspection-pdf':
+        final inspection = settings.arguments as QCInspectionResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: QCInspectionDataPDFScreen(inspection: inspection)),
+          settings: settings,
+        );
+
+      case '/logistics-dashboard':
+      case '/logistics-officer-dashboard':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: LogisticsOfficerDashboardScreen()),
+          settings: settings,
+        );
+
+      case '/inventory':
+      case '/inventory-data':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: InventoryDataScreen()),
+          settings: settings,
+        );
+
+      case '/inventory-create':
+        final inventoryToEdit = settings.arguments as InventoryResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: InventoryFormScreen(inventoryToEdit: inventoryToEdit)),
+          settings: settings,
+        );
+
+      case '/inventory-pdf':
+        final inventory = settings.arguments as InventoryResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: InventoryDataPDFScreen(inventory: inventory)),
+          settings: settings,
+        );
+
+      case '/stock-movement':
+      case '/stock-movement-data':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: StockMovementDataScreen()),
+          settings: settings,
+        );
+
+      case '/stock-movement-create':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: StockMovementScreen()),
+          settings: settings,
+        );
+
+      case '/stock-movement-pdf':
+        final movement = settings.arguments as StockMovementResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: StockMovementPDFScreen(movement: movement)),
+          settings: settings,
+        );
+
+      case '/grn':
+      case '/grn-data':
+      case '/good-received-notes':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: GoodReceivedNoteDataScreen()),
+          settings: settings,
+        );
+
+      case '/grn-create':
+        final grnToEdit = settings.arguments as GoodsReceivedNoteResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: GoodReceivedNoteFormScreen(grnToEdit: grnToEdit)),
+          settings: settings,
+        );
+
+      case '/grn-pdf':
+        final grn = settings.arguments as GoodsReceivedNoteResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: GoodReceivedNotePDFScreen(grn: grn)),
+          settings: settings,
+        );
+
+      case '/delivery-trip':
+      case '/delivery-trip-data':
+      case '/delivery-trips':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: DeliveryTripDataScreen()),
+          settings: settings,
+        );
+
+      case '/delivery-trip-create':
+        final tripToEdit = settings.arguments as DeliveryTripResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: DeliveryTripFormScreen(tripToEdit: tripToEdit)),
+          settings: settings,
+        );
+
+      case '/delivery-trip-pdf':
+        final trip = settings.arguments as DeliveryTripResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: DeliveryTripFormPDFScreen(trip: trip)),
+          settings: settings,
+        );
+
+      case '/vehicles':
+      case '/vehicle-data':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: VehicleDataScreen()),
+          settings: settings,
+        );
+
+      case '/customer-order-pdf':
+        final order = settings.arguments as CustomerOrderResponse;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: CustomerOrderPdfScreen(order: order)),
+          settings: settings,
+        );
+
+      case '/commercial-invoice-data':
+      case '/invoice-data':
+      case '/billing':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: CommercialInvoiceDataScreen()),
+          settings: settings,
+        );
+
+      case '/invoice-create':
+        final invToEdit = settings.arguments as InvoiceResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: CommercialInvoiceFormScreen(invoiceToEdit: invToEdit)),
+          settings: settings,
+        );
+
+      case '/commercial-invoice-pdf':
+        final inv = settings.arguments as InvoiceResponseModel;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: CommercialInvoicePdfScreen(invoice: inv)),
+          settings: settings,
+        );
+
+      case '/customer-payment-data':
+      case '/payment-statement':
+      case '/customer-payments':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: CustomerPaymentDataScreen()),
+          settings: settings,
+        );
+
+      case '/customer-payment-pdf':
+        final payment = settings.arguments as PaymentStatementResponse;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: CustomerPaymentPdfScreen(payment: payment)),
+          settings: settings,
+        );
+
+      case '/lc-bank-create':
+        final bankToEdit = settings.arguments as LCBankResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: LCBankFormScreen(bankToEdit: bankToEdit)),
+          settings: settings,
+        );
+
+      case '/vehicle-create':
+        final vehicleToEdit = settings.arguments as VehicleResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: VehicleFormScreen(vehicleToEdit: vehicleToEdit)),
+          settings: settings,
+        );
+
       case '/':
       default:
         return MaterialPageRoute(
@@ -292,10 +560,26 @@ class RoleRedirectScreen extends ConsumerWidget {
           case 'PROCUREMENT':
           case 'PROCUREMENT_OFFICER':
           case 'PURCHASING':
-          case 'COMMERCIAL_OFFICER':
             return const ProcurementDashboardScreen();
+          case 'COMMERCIAL':
+          case 'COMMERCIAL_OFFICER':
+          case 'ROLE_COMMERCIAL_OFFICER':
+            return const CommercialDashboardScreen();
           case 'SUPPLIER':
             return const SupplierDashboardScreen();
+          case 'DRIVER':
+          case 'ROLE_DRIVER':
+            return const DriverDashboardScreen();
+          case 'QC':
+          case 'QC_INSPECTOR':
+          case 'ROLE_QC_INSPECTOR':
+          case 'QC_INSPACTOR':
+          case 'ROLE_QC_INSPACTOR':
+            return const QCDashboardScreen();
+          case 'LOGISTICS':
+          case 'LOGISTICS_OFFICER':
+          case 'ROLE_LOGISTICS_OFFICER':
+            return const LogisticsOfficerDashboardScreen();
           default:
             return const LoginScreen();
         }

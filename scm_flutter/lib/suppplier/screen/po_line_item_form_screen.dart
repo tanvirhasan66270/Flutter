@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/entity/po_line_item_model.dart';
 import 'package:scm_flutter/suppplier/provider/po_line_item_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
@@ -51,10 +49,6 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = ref.watch(currentUserProvider);
-    final userName = currentUser?.name ?? 'Supplier';
-    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'S';
-
     return Scaffold(
       backgroundColor: AppTheme.surfaceWhite,
       body: SafeArea(
@@ -80,8 +74,8 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Parent PO Matrix
-                            _buildSectionLabel('PARENT PURCHASE ORDER MATRIX'),
+                            // Step 1: Parent PO Matrix
+                            _buildNumberedStepLabel(1, 'PARENT PURCHASE ORDER MATRIX *'),
                             _buildThemedDropdown<int>(
                               value: poId == 0 ? null : poId,
                               hint: '-- Link Master Purchase Order --',
@@ -91,10 +85,10 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
                               ],
                               onChanged: (val) => setState(() => poId = val ?? 0),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
 
-                            // Target SKUs
-                            _buildSectionLabel('TARGET SKUS PRODUCT MODULE'),
+                            // Step 2: Target SKUs
+                            _buildNumberedStepLabel(2, 'TARGET SKUS PRODUCT MODULE *'),
                             _buildThemedDropdown<int>(
                               value: productId == 0 ? null : productId,
                               hint: '-- Select Catalog Product --',
@@ -104,84 +98,50 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
                               ],
                               onChanged: (val) => setState(() => productId = val ?? 0),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
 
-                            // Row: Volume & Price
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildSectionLabel('ALLOCATED VOLUME (QTY)'),
-                                      _buildThemedField(
-                                        initialValue: '1',
-                                        icon: Icons.inventory_2_outlined,
-                                        iconColor: AppTheme.primary,
-                                        onChanged: (val) => quantity = int.tryParse(val) ?? 1,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildSectionLabel('EXPLICIT BASE PRICE (\$)'),
-                                      _buildThemedField(
-                                        initialValue: '0',
-                                        icon: Icons.attach_money,
-                                        iconColor: AppTheme.success,
-                                        onChanged: (val) => unitPrice = double.tryParse(val) ?? 0.0,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                            // Step 3: Allocated Volume
+                            _buildNumberedStepLabel(3, 'ALLOCATED VOLUME (QTY) *'),
+                            _buildThemedField(
+                              initialValue: quantity.toString(),
+                              icon: Icons.inventory_2_outlined,
+                              iconColor: AppTheme.primary,
+                              onChanged: (val) => quantity = int.tryParse(val) ?? 1,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
 
-                            // Row: Ref & Shipment
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildSectionLabel('QUOTATION REFERENCE'),
-                                      _buildThemedField(
-                                        hintText: 'e.g. QT-9982',
-                                        icon: Icons.description_outlined,
-                                        iconColor: AppTheme.purple,
-                                        onChanged: (val) => quotationRef = val,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildSectionLabel('SHIPMENT METHOD PATHWAY'),
-                                      _buildThemedField(
-                                        hintText: 'e.g. DHL Air Cargo',
-                                        icon: Icons.local_shipping_outlined,
-                                        iconColor: AppTheme.orange,
-                                        onChanged: (val) => shipmentMethod = val,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                            // Step 4: Explicit Base Price
+                            _buildNumberedStepLabel(4, 'EXPLICIT BASE PRICE (\$) *'),
+                            _buildThemedField(
+                              initialValue: unitPrice.toStringAsFixed(2),
+                              icon: Icons.attach_money,
+                              iconColor: AppTheme.success,
+                              onChanged: (val) => unitPrice = double.tryParse(val) ?? 0.0,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
 
-                            // Target Delivery Date
-                            _buildSectionLabel('TARGET DELIVERY DATE'),
+                            // Step 5: Quotation Reference
+                            _buildNumberedStepLabel(5, 'QUOTATION REFERENCE'),
+                            _buildThemedField(
+                              hintText: 'e.g. QT-9982',
+                              icon: Icons.description_outlined,
+                              iconColor: AppTheme.purple,
+                              onChanged: (val) => quotationRef = val,
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Step 6: Shipment Method Pathway
+                            _buildNumberedStepLabel(6, 'SHIPMENT METHOD PATHWAY'),
+                            _buildThemedField(
+                              hintText: 'e.g. DHL Air Cargo',
+                              icon: Icons.local_shipping_outlined,
+                              iconColor: AppTheme.orange,
+                              onChanged: (val) => shipmentMethod = val,
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Step 7: Target Delivery Date
+                            _buildNumberedStepLabel(7, 'TARGET DELIVERY DATE'),
                             _buildThemedField(
                               hintText: 'mm/dd/yyyy',
                               icon: Icons.calendar_today_outlined,
@@ -189,10 +149,10 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
                               suffixIcon: Icons.calendar_month,
                               onChanged: (val) => deliveryDate = val,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
 
-                            // Sourcing Directives
-                            _buildSectionLabel('SOURCING PIPELINE DIRECTIVES'),
+                            // Step 8: Sourcing Pipeline Directives
+                            _buildNumberedStepLabel(8, 'SOURCING PIPELINE DIRECTIVES'),
                             _buildThemedField(
                               hintText: 'Enter custom pipeline allocation logistics notes context...',
                               icon: Icons.assignment_outlined,
@@ -248,51 +208,6 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
     );
   }
 
-  Widget _buildTopBar(String userName, String userInitial) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: const Color(0xFFEFF6FF), borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.business_center, color: AppTheme.primary, size: 20),
-              ),
-              const SizedBox(width: 12),
-              const Text('SCM ENTERPRISE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.dark)),
-            ],
-          ),
-          Row(
-            children: [
-              const DynamicNotificationButton(),
-              const SizedBox(width: 4),
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: AppTheme.primary,
-                child: Text(userInitial, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.logout, color: AppTheme.danger, size: 20),
-                onPressed: () {
-                  ref.read(authControllerProvider.notifier).logout();
-                  Navigator.of(context).pushReplacementNamed('/login');
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFormHeader() {
     return Container(
       width: double.infinity,
@@ -323,12 +238,28 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildNumberedStepLabel(int stepNum, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 2),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF475569), letterSpacing: 0.5),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF475569), letterSpacing: 0.5),
+          ),
+        ],
       ),
     );
   }

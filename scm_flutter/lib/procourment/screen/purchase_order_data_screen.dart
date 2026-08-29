@@ -6,7 +6,7 @@ import 'package:scm_flutter/procourment/provider/purchase_order_provider.dart';
 import 'package:scm_flutter/procourment/screen/purchase-order_screen.dart';
 import 'package:scm_flutter/procourment/screen/purchase_order_pdf_screen.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 class PurchaseOrderDataScreen extends ConsumerStatefulWidget {
@@ -99,7 +99,7 @@ class _PurchaseOrderDataScreenState extends ConsumerState<PurchaseOrderDataScree
     final isManagementRole = (userRole == 'ADMIN' || userRole == 'MANAGER' || userRole == 'PROCUREMENT');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: DynamicScmTopNavBar(
         title: 'Purchase Orders',
         showBackButton: true,
@@ -107,7 +107,7 @@ class _PurchaseOrderDataScreenState extends ConsumerState<PurchaseOrderDataScree
       ),
       floatingActionButton: isManagementRole
           ? FloatingActionButton.extended(
-              backgroundColor: const Color(0xFF2563EB),
+              backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add),
               label: const Text('Add PO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),

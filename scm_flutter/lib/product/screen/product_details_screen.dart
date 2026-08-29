@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/entity/productModel.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
 
 class ProductDetailsScreen extends ConsumerWidget {
@@ -32,7 +33,7 @@ class ProductDetailsScreen extends ConsumerWidget {
     final imageUrl = _resolveImageUrl(product.image);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

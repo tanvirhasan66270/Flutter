@@ -10,8 +10,6 @@ class ChatWorkspaceScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedContact = ref.watch(selectedContactProvider);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -20,18 +18,8 @@ class ChatWorkspaceScreen extends ConsumerWidget {
         foregroundColor: Colors.black87,
         elevation: 0,
         leading: const BackButton(),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh Chats',
-            icon: const Icon(Icons.refresh, color: AppTheme.primary),
-            onPressed: () {
-              ref.invalidate(chatlistProvider);
-              if (selectedContact != null) {
-                ref.invalidate(chatHistoryProvider(selectedContact.contactId));
-              }
-            },
-          ),
-          const SizedBox(width: 8),
+        actions: const [
+          SizedBox(width: 8),
         ],
       ),
       body: LayoutBuilder(

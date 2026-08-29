@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:scm_flutter/entity/purchase_requisition_model.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class PurchaseRequisitionDataPDFScreen extends StatelessWidget {
   final PurchaseRequisitionResponse requisition;
@@ -66,16 +67,35 @@ class PurchaseRequisitionDataPDFScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex('#2563EB'),
-                    borderRadius: pw.BorderRadius.circular(4),
-                  ),
-                  child: pw.Text(
-                    '#PRQ-${requisition.id}',
-                    style: pw.TextStyle(color: PdfColors.white, fontSize: 14, fontWeight: pw.FontWeight.bold),
-                  ),
+                pw.Row(
+                  children: [
+                    pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColor.fromHex('#2563EB'),
+                        borderRadius: pw.BorderRadius.circular(4),
+                      ),
+                      child: pw.Text(
+                        '#PRQ-${requisition.id}',
+                        style: pw.TextStyle(color: PdfColors.white, fontSize: 14, fontWeight: pw.FontWeight.bold),
+                      ),
+                    ),
+                    pw.SizedBox(width: 10),
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(3),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColors.white,
+                        border: pw.Border.all(color: PdfColors.grey300),
+                        borderRadius: pw.BorderRadius.circular(4),
+                      ),
+                      child: pw.BarcodeWidget(
+                        barcode: pw.Barcode.qrCode(),
+                        data: 'PRQ:${requisition.id}|URGENCY:${requisition.urgencyLevel}',
+                        width: 44,
+                        height: 44,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -127,7 +147,7 @@ class PurchaseRequisitionDataPDFScreen extends StatelessWidget {
                 border: pw.Border.all(color: PdfColors.grey300),
               ),
               child: pw.Text(
-                requisition.supplierNames.isEmpty ? 'No target suppliers specified' : requisition.supplierNames.join('   •   '),
+                requisition.supplierNames.isEmpty ? 'No target suppliers specified' : requisition.supplierNames.join('  |  '),
                 style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#1E293B')),
               ),
             ),
@@ -194,7 +214,7 @@ class PurchaseRequisitionDataPDFScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         title: Text(
           'Requisition Document #PRQ-${requisition.id}',

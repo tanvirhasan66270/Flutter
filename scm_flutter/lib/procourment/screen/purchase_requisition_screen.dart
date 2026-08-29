@@ -7,7 +7,7 @@ import 'package:scm_flutter/entity/supplier_model.dart';
 import 'package:scm_flutter/procourment/provider/purchase_requisition_provider.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 class PurchaseRequisitionScreen extends ConsumerStatefulWidget {
@@ -78,18 +78,14 @@ class _PurchaseRequisitionScreenState extends ConsumerState<PurchaseRequisitionS
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = ref.watch(currentUserProvider);
     final productListAsync = ref.watch(productListProvider);
     final supplierListAsync = ref.watch(supplierListProvider);
-
-    final String userName = currentUser?.name ?? 'User';
-    final String userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'P';
 
     final List<ProductResponseModel> products = productListAsync.value ?? [];
     final List<SupplierResponseDTO> suppliers = supplierListAsync.value ?? [];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       body: SafeArea(
         child: Column(
           children: [
@@ -193,107 +189,73 @@ class _PurchaseRequisitionScreenState extends ConsumerState<PurchaseRequisitionS
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ── 1. PRODUCT SPECIFICATION VECTOR ──
-                      _buildSectionLabel('PRODUCT SPECIFICATION VECTOR'),
+                      _buildNumberedStepLabel(1, 'PRODUCT SPECIFICATION VECTOR *'),
                       _buildProductDropdown(products),
                       const SizedBox(height: 8),
                       _buildProductChipsStack(products),
                       const SizedBox(height: 16),
 
                       // ── 2. TARGET PREFERRED SUPPLIER ROUTING NODES ──
-                      _buildSectionLabel('TARGET PREFERRED SUPPLIER ROUTING NODES'),
+                      _buildNumberedStepLabel(2, 'TARGET PREFERRED SUPPLIER ROUTING NODES'),
                       _buildSupplierDropdown(suppliers, supplierListAsync.isLoading),
                       const SizedBox(height: 8),
                       _buildSupplierChipsStack(suppliers),
                       const SizedBox(height: 16),
 
-                      // ── 3. Row 1: Quantity & Urgency (Preventing horizontal overflow) ──
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('REQUIRED CONSIGNMENT UNITS'),
-                                TextFormField(
-                                  controller: _quantityController,
-                                  keyboardType: TextInputType.number,
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration(icon: Icons.format_list_numbered),
-                                  onChanged: (val) {
-                                    _quantityRequired = int.tryParse(val) ?? 1;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('URGENCY STRATUM LEVEL'),
-                                DropdownButtonFormField<String>(
-                                  isExpanded: true,
-                                  initialValue: _urgencyLevel,
-                                  decoration: _inputDecoration(icon: Icons.warning_amber_rounded),
-                                  items: const [
-                                    DropdownMenuItem(value: 'LOW', child: Text('LOW Urgency', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
-                                    DropdownMenuItem(value: 'MEDIUM', child: Text('MEDIUM Pipeline', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
-                                    DropdownMenuItem(value: 'HIGH', child: Text('HIGH Accelerated', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
-                                    DropdownMenuItem(value: 'CRITICAL', child: Text('CRITICAL Vector', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
-                                  ],
-                                  onChanged: (val) {
-                                    if (val != null) setState(() => _urgencyLevel = val);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // ── 3. REQUIRED CONSIGNMENT UNITS ──
+                      _buildNumberedStepLabel(3, 'REQUIRED CONSIGNMENT UNITS *'),
+                      TextFormField(
+                        controller: _quantityController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                        decoration: _inputDecoration(icon: Icons.format_list_numbered),
+                        onChanged: (val) {
+                          _quantityRequired = int.tryParse(val) ?? 1;
+                        },
                       ),
                       const SizedBox(height: 16),
 
-                      // ── 4. Row 2: Target Date & Currency (Preventing horizontal overflow) ──
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('TARGET REQUIRED DATE DEADLINE'),
-                                TextFormField(
-                                  controller: _dateController,
-                                  readOnly: true,
-                                  onTap: _pickDate,
-                                  style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
-                                  decoration: _inputDecoration(icon: Icons.calendar_today_outlined, hintText: 'mm/dd/yyyy'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('CURRENCY SETTLEMENT'),
-                                TextFormField(
-                                  enabled: false,
-                                  initialValue: 'USD (\$) Fixed Gat...',
-                                  style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold),
-                                  decoration: _inputDecoration(icon: Icons.attach_money),
-                                ),
-                              ],
-                            ),
-                          ),
+                      // ── 4. URGENCY STRATUM LEVEL ──
+                      _buildNumberedStepLabel(4, 'URGENCY STRATUM LEVEL *'),
+                      DropdownButtonFormField<String>(
+                        isExpanded: true,
+                        initialValue: _urgencyLevel,
+                        decoration: _inputDecoration(icon: Icons.warning_amber_rounded),
+                        items: const [
+                          DropdownMenuItem(value: 'LOW', child: Text('LOW Urgency', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'MEDIUM', child: Text('MEDIUM Pipeline', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'HIGH', child: Text('HIGH Accelerated', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'CRITICAL', child: Text('CRITICAL Vector', style: TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis)),
                         ],
+                        onChanged: (val) {
+                          if (val != null) setState(() => _urgencyLevel = val);
+                        },
                       ),
                       const SizedBox(height: 16),
 
-                      // ── 5. Remarks & Directives ──
-                      _buildSectionLabel('SPECIAL REQUISITION DIRECTIVES & REMARKS'),
+                      // ── 5. TARGET REQUIRED DATE DEADLINE ──
+                      _buildNumberedStepLabel(5, 'TARGET REQUIRED DATE DEADLINE'),
+                      TextFormField(
+                        controller: _dateController,
+                        readOnly: true,
+                        onTap: _pickDate,
+                        style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                        decoration: _inputDecoration(icon: Icons.calendar_today_outlined, hintText: 'mm/dd/yyyy'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ── 6. CURRENCY SETTLEMENT ──
+                      _buildNumberedStepLabel(6, 'CURRENCY SETTLEMENT'),
+                      TextFormField(
+                        enabled: false,
+                        initialValue: 'USD (\$) Fixed Gateway',
+                        style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold),
+                        decoration: _inputDecoration(icon: Icons.attach_money),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ── 7. SPECIAL REQUISITION DIRECTIVES & REMARKS ──
+                      _buildNumberedStepLabel(7, 'SPECIAL REQUISITION DIRECTIVES & REMARKS'),
                       TextFormField(
                         controller: _remarksController,
                         maxLines: 3,
@@ -358,12 +320,28 @@ class _PurchaseRequisitionScreenState extends ConsumerState<PurchaseRequisitionS
   }
 
   // Helper Widget for Section Labels
-  Widget _buildSectionLabel(String label) {
+  Widget _buildNumberedStepLabel(int stepNum, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+          ),
+        ],
       ),
     );
   }

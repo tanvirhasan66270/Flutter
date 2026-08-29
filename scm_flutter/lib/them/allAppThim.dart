@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// Mirrors the Bootstrap and SCM Enterprise design system
-class AppTheme {
+class AppTheme
+{
   AppTheme._();
 
   static const Color primary = Color(0xFF0D6EFD); // Bootstrap primary blue
@@ -15,6 +16,10 @@ class AppTheme {
 
   // ── নতুন ও আধুনিক এন্টারপ্রাইজ কালার যোগ করা হলো ──
   static const Color teal = Color(0xFF20C997);      // Teal color for line items/reports
+  static const Color tealDark = Color(0xFF0F766E);  // Dark Teal
+  static const Color tealPrimary = Color(0xFF0D9488); // Primary Teal
+  static const Color tealLight = Color(0xFF14B8A6); // Light Teal
+  static const Color tealBackground = Color(0xFFCCFBF1); // Background Teal
   static const Color purple = Color(0xFF6F42C1);    // Purple for messages/special badges
   static const Color orange = Color(0xFFFD7E14);    // Orange for LCs or alerts
   static const Color pink = Color(0xFFD63384);      // Pink for archives/special tags
@@ -22,13 +27,20 @@ class AppTheme {
 
   // UI ব্যাকগ্রাউন্ড ও বর্ডার কালার
   static const Color surfaceWhite = Color(0xFFFFFFFF);
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color black = Color(0xFF000000);
+  static const Color grey = Color(0xFF6C757D);
   static const Color borderGrey = Color(0xFFCED4DA);
   static const Color cardShadow = Color(0x1A000000);
 
-
-  // ── Core Palette ───────────────────────────────────────
+  // ── Core Palette & Custom Shading ───────────────────────
   static const Color primaryDark = Color(0xFF1D4ED8);  // Dark Blue
   static const Color primaryLight = Color(0xFF3B82F6); // Light Blue
+  static const Color blue = Color(0xFF2563EB);
+  static const Color blueLight = Color(0xFFE0E7FF);
+  static const Color indigoDark = Color(0xFF4338CA);
+  static const Color bgLight = Color(0xFFF8FAFC);
+  static const Color textMuted = Color(0xFF64748B);
 
 
 

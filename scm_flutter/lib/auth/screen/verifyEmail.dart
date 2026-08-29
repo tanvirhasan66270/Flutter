@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiClint.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
@@ -57,7 +58,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               else ...[
                 Icon(
                   _success ? Icons.check_circle : Icons.error,
-                  color: _success ? Colors.green : Colors.red,
+                  color: _success ? AppTheme.success : AppTheme.danger,
                   size: 56,
                 ),
                 const SizedBox(height: 16),

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
-import 'package:scm_flutter/util/pdf_invoice_generator.dart';
+import 'package:scm_flutter/cutomer/screen/customer_order_pdf_screen.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class CustomerOrderDataScreen extends ConsumerStatefulWidget {
   const CustomerOrderDataScreen({super.key});
@@ -31,32 +32,32 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'DELIVERED':
-        return const Color(0xFF16A34A);
+        return AppTheme.success;
       case 'PROCESSING':
       case 'SHIPPED':
       case 'OUT_FOR_DELIVERY':
       case 'CONFIRMED':
-        return const Color(0xFF2563EB);
+        return AppTheme.primary;
       case 'PENDING':
-        return const Color(0xFFD97706);
+        return AppTheme.warning;
       case 'CANCELLED':
-        return const Color(0xFFDC2626);
+        return AppTheme.danger;
       default:
-        return Colors.grey;
+        return AppTheme.grey;
     }
   }
 
   Color _getPaymentStatusColor(String status) {
     switch (status.toUpperCase()) {
       case 'PAID':
-        return const Color(0xFF16A34A);
+        return AppTheme.success;
       case 'PARTIALLY_PAID':
-        return const Color(0xFFD97706);
+        return AppTheme.warning;
       case 'UNPAID':
       case 'REFUNDED':
-        return const Color(0xFFDC2626);
+        return AppTheme.danger;
       default:
-        return Colors.grey;
+        return AppTheme.grey;
     }
   }
 
@@ -65,22 +66,17 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
     final myOrdersAsync = ref.watch(myCustomerOrdersProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         title: const Text(
           'Customer Orders Directory',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 17),
+          style: TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 17),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black87),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh Orders',
-            icon: const Icon(Icons.refresh, color: Color(0xFF2563EB)),
-            onPressed: () => ref.invalidate(myCustomerOrdersProvider),
-          ),
-          const DynamicNotificationButton(),
+        leading: const BackButton(color: AppTheme.dark),
+        actions: const [
+          DynamicNotificationButton(),
         ],
       ),
       body: RefreshIndicator(
@@ -95,12 +91,12 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const Icon(Icons.error_outline, color: AppTheme.danger, size: 48),
                   const SizedBox(height: 12),
                   Text(
                     'Failed to load customer orders: $err',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red, fontSize: 13),
+                    style: const TextStyle(color: AppTheme.danger, fontSize: 13),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -148,7 +144,7 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+                        colors: [AppTheme.dark, AppTheme.indigoDark],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -159,11 +155,11 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.analytics_outlined, color: Colors.blueAccent, size: 20),
+                            Icon(Icons.analytics_outlined, color: AppTheme.blueLight, size: 20),
                             SizedBox(width: 8),
                             Text(
                               'ORDER PIPELINE SUMMARY',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 0.5),
+                              style: TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 0.5),
                             ),
                           ],
                         ),
@@ -171,16 +167,16 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                         Row(
                           children: [
                             Expanded(
-                              child: _buildBannerMetric('Total Orders', '${orders.length}', Colors.white),
+                              child: _buildBannerMetric('Total Orders', '${orders.length}', AppTheme.white),
                             ),
                             Expanded(
-                              child: _buildBannerMetric('Total Value', '৳${totalVal.toStringAsFixed(0)}', const Color(0xFF60A5FA)),
+                              child: _buildBannerMetric('Total Value', '৳${totalVal.toStringAsFixed(0)}', AppTheme.blueLight),
                             ),
                             Expanded(
-                              child: _buildBannerMetric('Paid Amount', '৳${paidVal.toStringAsFixed(0)}', const Color(0xFF4ADE80)),
+                              child: _buildBannerMetric('Paid Amount', '৳${paidVal.toStringAsFixed(0)}', AppTheme.success),
                             ),
                             Expanded(
-                              child: _buildBannerMetric('Due Balance', '৳${dueVal.toStringAsFixed(0)}', const Color(0xFFF87171)),
+                              child: _buildBannerMetric('Due Balance', '৳${dueVal.toStringAsFixed(0)}', AppTheme.danger),
                             ),
                           ],
                         ),
@@ -195,7 +191,7 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                     onChanged: (val) => setState(() => _searchQuery = val.trim()),
                     decoration: InputDecoration(
                       hintText: 'Search by Order #, status, payment method...',
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                      prefixIcon: const Icon(Icons.search, color: AppTheme.grey),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear, size: 18),
@@ -207,10 +203,10 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                           : null,
                       isDense: true,
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: AppTheme.white,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTheme.borderGrey)),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTheme.borderGrey)),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -230,15 +226,15 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : Colors.black87,
+                                color: isSelected ? AppTheme.white : AppTheme.dark,
                               ),
                             ),
-                            selectedColor: const Color(0xFF2563EB),
-                            backgroundColor: Colors.white,
-                            checkmarkColor: Colors.white,
+                            selectedColor: AppTheme.primary,
+                            backgroundColor: AppTheme.white,
+                            checkmarkColor: AppTheme.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(color: isSelected ? const Color(0xFF2563EB) : Colors.grey.shade300),
+                              side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderGrey),
                             ),
                             onSelected: (_) => setState(() => _selectedStatusFilter = status),
                           ),
@@ -254,17 +250,17 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppTheme.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(color: AppTheme.borderGrey),
                       ),
                       child: const Column(
                         children: [
-                          Icon(Icons.inbox_outlined, size: 48, color: Colors.grey),
+                          Icon(Icons.inbox_outlined, size: 48, color: AppTheme.grey),
                           SizedBox(height: 12),
-                          Text('No customer orders found.', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 14)),
+                          Text('No customer orders found.', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.grey, fontSize: 14)),
                           SizedBox(height: 4),
-                          Text('Try adjusting your search query or filters.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                          Text('Try adjusting your search query or filters.', style: TextStyle(color: AppTheme.grey, fontSize: 12)),
                         ],
                       ),
                     )
@@ -287,11 +283,11 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                         return Container(
                           margin: const EdgeInsets.only(bottom: 14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppTheme.white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade200),
+                            border: Border.all(color: AppTheme.borderGrey),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
+                              BoxShadow(color: AppTheme.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
                             ],
                           ),
                           child: Column(
@@ -300,10 +296,10 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                               // Order Header Bar
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
-                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                  border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                                decoration: const BoxDecoration(
+                                  color: AppTheme.light,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                                  border: Border(bottom: BorderSide(color: AppTheme.borderGrey)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -311,12 +307,12 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                     Expanded(
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.receipt_long, size: 16, color: Color(0xFF2563EB)),
+                                          const Icon(Icons.receipt_long, size: 16, color: AppTheme.primary),
                                           const SizedBox(width: 6),
                                           Expanded(
                                             child: Text(
                                               order.orderNumber,
-                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0B2545)),
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.dark),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
@@ -353,9 +349,9 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Text('ORDER DATE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                              const Text('ORDER DATE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey)),
                                               const SizedBox(height: 2),
-                                              Text(dateFormatted, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                              Text(dateFormatted, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.dark)),
                                             ],
                                           ),
                                         ),
@@ -363,9 +359,9 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Text('SERVICE / PRIORITY', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                              const Text('SERVICE / PRIORITY', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey)),
                                               const SizedBox(height: 2),
-                                              Text('${order.serviceType} (${order.priority})', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                              Text('${order.serviceType} (${order.priority})', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.dark)),
                                             ],
                                           ),
                                         ),
@@ -373,7 +369,7 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.end,
                                             children: [
-                                              const Text('PAYMENT STATUS', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                              const Text('PAYMENT STATUS', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey)),
                                               const SizedBox(height: 2),
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -398,16 +394,16 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF8FAFC),
+                                          color: AppTheme.light,
                                           borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: Colors.grey.shade200),
+                                          border: Border.all(color: AppTheme.borderGrey),
                                         ),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              'PRODUCTS (${order.lineItems.length}):',
-                                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey),
+                                            const Text(
+                                              'PRODUCTS:',
+                                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey),
                                             ),
                                             const SizedBox(height: 4),
                                             ...order.lineItems.take(2).map((item) => Padding(
@@ -417,14 +413,14 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                                     children: [
                                                       Expanded(
                                                         child: Text(
-                                                          '• ${item.productName}',
-                                                          style: const TextStyle(fontSize: 11, color: Colors.black87),
+                                                          '- ${item.productName}',
+                                                          style: const TextStyle(fontSize: 11, color: AppTheme.dark),
                                                           overflow: TextOverflow.ellipsis,
                                                         ),
                                                       ),
                                                       Text(
                                                         'Qty: ${item.quantity}  ×  ৳${item.unitPrice.toStringAsFixed(0)}',
-                                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87),
+                                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.dark),
                                                       ),
                                                     ],
                                                   ),
@@ -432,7 +428,7 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                             if (order.lineItems.length > 2)
                                               Text(
                                                 '+ ${order.lineItems.length - 2} more item(s)...',
-                                                style: const TextStyle(fontSize: 10, color: Color(0xFF2563EB), fontStyle: FontStyle.italic),
+                                                style: const TextStyle(fontSize: 10, color: AppTheme.primary, fontStyle: FontStyle.italic),
                                               ),
                                           ],
                                         ),
@@ -447,22 +443,22 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            const Text('TOTAL AMOUNT', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
-                                            Text('৳${order.totalAmount.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF059669))),
+                                            const Text('TOTAL AMOUNT', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey)),
+                                            Text('৳${order.totalAmount.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.success)),
                                           ],
                                         ),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            const Text('PAID AMOUNT', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
-                                            Text('৳${paid.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF16A34A))),
+                                            const Text('PAID AMOUNT', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey)),
+                                            Text('৳${paid.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.success)),
                                           ],
                                         ),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
-                                            const Text('DUE AMOUNT', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
-                                            Text('৳${due.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: due > 0 ? const Color(0xFFDC2626) : Colors.grey)),
+                                            const Text('DUE AMOUNT', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.grey)),
+                                            Text('৳${due.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: due > 0 ? AppTheme.danger : AppTheme.grey)),
                                           ],
                                         ),
                                       ],
@@ -479,21 +475,20 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                         // PDF View / Download Button for this order data row
                                         ElevatedButton.icon(
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF1E40AF),
-                                            foregroundColor: Colors.white,
+                                            backgroundColor: AppTheme.primaryDark,
+                                            foregroundColor: AppTheme.white,
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                           ),
                                           icon: const Icon(Icons.picture_as_pdf, size: 16),
                                           label: const Text('View Order PDF', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                                          onPressed: () async {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text('Generating PDF for ${order.orderNumber}...'),
-                                                duration: const Duration(seconds: 1),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => CustomerOrderPdfScreen(order: order),
                                               ),
                                             );
-                                            await PdfInvoiceGenerator.downloadOrPrint(order: order);
                                           },
                                         ),
 
@@ -503,8 +498,8 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                             // Track Order Button
                                             OutlinedButton.icon(
                                               style: OutlinedButton.styleFrom(
-                                                foregroundColor: const Color(0xFF2563EB),
-                                                side: const BorderSide(color: Color(0xFFBFDBFE)),
+                                                foregroundColor: AppTheme.primary,
+                                                side: const BorderSide(color: AppTheme.blueLight),
                                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                               ),
@@ -523,8 +518,8 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                               // Pay Due Button
                                               ElevatedButton.icon(
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(0xFF16A34A),
-                                                  foregroundColor: Colors.white,
+                                                  backgroundColor: AppTheme.success,
+                                                  foregroundColor: AppTheme.white,
                                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                                 ),
@@ -572,7 +567,7 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: AppTheme.grey, fontSize: 9, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
       ],

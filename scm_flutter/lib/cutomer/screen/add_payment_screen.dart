@@ -8,6 +8,7 @@ import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/cutomer/provider/payment_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/payment_statement_model.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiClint.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
 
@@ -81,17 +82,37 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen> {
     }
   }
 
-  Widget _buildImagePickerSection(String label) {
+  Widget _buildStepLabel(int stepNum, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImagePickerSection(int stepNum, String label) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const Icon(Icons.image_outlined, size: 14, color: Colors.grey),
-            const SizedBox(width: 4),
-            Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
-          ],
-        ),
+        _buildStepLabel(stepNum, label),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.all(2),
@@ -201,7 +222,7 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         title: const Text('Add Payment', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.white,
@@ -236,7 +257,21 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Settle Your Dues', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          Row(
+            children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
+                child: const Center(
+                  child: Text('1', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text('Settle Your Dues *', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 4),
           const Text('Search your order to submit a payment record', style: TextStyle(color: Colors.white70, fontSize: 12)),
           const SizedBox(height: 16),
           Container(
@@ -294,15 +329,17 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen> {
           ),
         ),
         const SizedBox(height: 24),
+        _buildStepLabel(2, 'AMOUNT TO PAY *'),
         TextFormField(
           controller: _amountController,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Amount to Pay', prefixText: '৳ '),
+          decoration: const InputDecoration(hintText: 'e.g. 5000', prefixText: '৳ '),
         ),
         const SizedBox(height: 16),
+        _buildStepLabel(3, 'PAYMENT METHOD *'),
         DropdownButtonFormField<String>(
           initialValue: _selectedMethod,
-          decoration: const InputDecoration(labelText: 'Payment Method'),
+          decoration: const InputDecoration(hintText: 'Select Payment Method'),
           items: PaymentMethod.values.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
           onChanged: (v) => setState(() => _selectedMethod = v!),
         ),
@@ -310,12 +347,13 @@ class _AddPaymentScreenState extends ConsumerState<AddPaymentScreen> {
         if (_selectedMethod != PaymentMethod.cash) ...[
           _buildMethodAlert(),
           const SizedBox(height: 16),
+          _buildStepLabel(4, _selectedMethod == PaymentMethod.bank ? 'YOUR BANK ACCOUNT NO *' : 'YOUR WALLET NUMBER *'),
           TextFormField(
             controller: _accountController,
-            decoration: InputDecoration(labelText: _selectedMethod == PaymentMethod.bank ? 'Your Bank Account No' : 'Your Wallet Number'),
+            decoration: InputDecoration(hintText: _selectedMethod == PaymentMethod.bank ? 'Enter Bank A/C No' : 'Enter MFS Wallet No'),
           ),
           const SizedBox(height: 16),
-          _buildImagePickerSection('Payment Proof / Check Image (Optional)'),
+          _buildImagePickerSection(5, 'PAYMENT PROOF / CHECK IMAGE (OPTIONAL)'),
         ],
         const SizedBox(height: 32),
         LoadingButton(

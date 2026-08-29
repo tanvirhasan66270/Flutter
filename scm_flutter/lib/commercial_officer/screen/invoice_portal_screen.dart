@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiClint.dart';
 import 'package:scm_flutter/util/pdf_invoice_generator.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
@@ -38,7 +39,7 @@ class _InvoicePortalScreenState extends ConsumerState<InvoicePortalScreen> {
     final orderAsync = (_searchedCode != null) ? ref.watch(trackCustomerOrderProvider(_searchedCode!)) : null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         title: const Text('Invoice Portal', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.white,

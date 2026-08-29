@@ -97,7 +97,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking image: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error picking image: $e'), backgroundColor: AppTheme.danger),
         );
       }
     }
@@ -151,7 +151,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
         ScaffoldMessenger.of(currentContext).showSnackBar(
           const SnackBar(
             content: Text('Profile Registry Updated Successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.success,
           ),
         );
         setState(() {
@@ -162,7 +162,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     } catch (e) {
       if (mounted && currentContext.mounted) {
         ScaffoldMessenger.of(currentContext).showSnackBar(
-          SnackBar(content: Text(apiErrorMessage(e)), backgroundColor: Colors.red),
+          SnackBar(content: Text(apiErrorMessage(e)), backgroundColor: AppTheme.danger),
         );
       }
     } finally {
@@ -175,18 +175,13 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     final customerAsync = ref.watch(currentCustomerProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
-        title: const Text('My Profile', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.white,
+        title: const Text('My Profile', style: TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: AppTheme.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black87),
+        leading: const BackButton(color: AppTheme.dark),
         actions: [
-          IconButton(
-            tooltip: 'Refresh Profile',
-            icon: const Icon(Icons.refresh, color: AppTheme.primary),
-            onPressed: () => ref.invalidate(currentCustomerProvider),
-          ),
           TextButton.icon(
             onPressed: () => setState(() => _isEditing = !_isEditing),
             icon: Icon(_isEditing ? Icons.close : Icons.edit_outlined, size: 18),
@@ -244,8 +239,8 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                   label: Text(_selectedImage == null ? 'Choose New Image' : 'Image Selected: ${_selectedImage!.name}'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    foregroundColor: _selectedImage != null ? AppTheme.primary : Colors.black87,
-                    side: BorderSide(color: _selectedImage != null ? AppTheme.primary : Colors.grey.shade400),
+                    foregroundColor: _selectedImage != null ? AppTheme.primary : AppTheme.dark,
+                    side: BorderSide(color: _selectedImage != null ? AppTheme.primary : AppTheme.borderGrey),
                   ),
                 ),
               ),
@@ -256,13 +251,13 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
             ElevatedButton.icon(
               onPressed: _isUpdating ? null : () => _updateProfile(customer),
               icon: _isUpdating
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.white))
                   : const Icon(Icons.cloud_upload_outlined),
               label: const Text('UPLOAD NEW AVATAR'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
                 backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppTheme.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
@@ -277,7 +272,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('PERSONAL REGISTRY DETAILS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+              const Text('PERSONAL REGISTRY DETAILS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.dark)),
               if (!_isEditing)
                 InkWell(
                   onTap: () => setState(() => _isEditing = true),
@@ -290,7 +285,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           const SizedBox(height: 24),
 
           // ── Logistics & Location Metadata ───────────
-          const Text('LOGISTICS & LOCATION METADATA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+          const Text('LOGISTICS & LOCATION METADATA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.dark)),
           const SizedBox(height: 12),
           _buildLocationSection(customer),
           const SizedBox(height: 12),
@@ -299,15 +294,15 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppTheme.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: AppTheme.borderGrey),
             ),
             child: Row(
               children: [
-                const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                const Icon(Icons.access_time, size: 16, color: AppTheme.grey),
                 const SizedBox(width: 8),
-                Text('Registered: ${customer.createdAt}', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                Text('Registered: ${customer.createdAt}', style: const TextStyle(color: AppTheme.grey, fontSize: 11)),
               ],
             ),
           ),
@@ -317,13 +312,13 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           ElevatedButton.icon(
             onPressed: _isUpdating ? null : () => _updateProfile(customer),
             icon: _isUpdating
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.white))
                 : const Icon(Icons.verified_user_outlined),
             label: Text(_isUpdating ? 'UPDATING REGISTRY...' : 'UPDATE PROFILE REGISTRY'),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 54),
               backgroundColor: AppTheme.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppTheme.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
@@ -352,17 +347,17 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
             children: [
               CircleAvatar(
                 radius: 45,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: AppTheme.borderGrey,
                 backgroundImage: imageProvider,
-                child: imageProvider == null ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
+                child: imageProvider == null ? const Icon(Icons.person, size: 50, color: AppTheme.grey) : null,
               ),
               Positioned(
                 right: 0,
                 bottom: 0,
                 child: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(color: Color(0xFF0D6EFD), shape: BoxShape.circle),
-                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
+                  decoration: const BoxDecoration(color: AppTheme.primary, shape: BoxShape.circle),
+                  child: const Icon(Icons.camera_alt, color: AppTheme.white, size: 14),
                 ),
               ),
             ],
@@ -375,14 +370,14 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
             children: [
               Text(
                 customer.name,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.dark),
               ),
               Row(
                 children: [
-                  const Text('Role: ', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  const Text('Role: ', style: TextStyle(fontSize: 12, color: AppTheme.grey)),
                   Text(
                     customer.role.toUpperCase(),
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0D6EFD)),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
                   ),
                 ],
               ),
@@ -392,14 +387,14 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+                      decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppTheme.borderGrey)),
                       child: Column(
                         children: [
                           const Text('4.9', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                           Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-                            Icon(Icons.star, color: Colors.orange, size: 12),
+                            Icon(Icons.star, color: AppTheme.warning, size: 12),
                             SizedBox(width: 4),
-                            Text('SCORE', style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
+                            Text('SCORE', style: TextStyle(fontSize: 9, color: AppTheme.grey, fontWeight: FontWeight.bold)),
                           ]),
                         ],
                       ),
@@ -409,14 +404,14 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade200)),
+                      decoration: BoxDecoration(color: AppTheme.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppTheme.borderGrey)),
                       child: Column(
                         children: [
-                          const Text('Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.green)),
+                          const Text('Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.success)),
                           Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-                            Icon(Icons.check_circle, color: Colors.green, size: 12),
+                            Icon(Icons.check_circle, color: AppTheme.success, size: 12),
                             SizedBox(width: 4),
-                            Text('STATUS', style: TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
+                            Text('STATUS', style: TextStyle(fontSize: 9, color: AppTheme.grey, fontWeight: FontWeight.bold)),
                           ]),
                         ],
                       ),
@@ -435,9 +430,9 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppTheme.borderGrey),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,14 +440,14 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Completion Profile', style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)),
+              const Text('Completion Profile', style: TextStyle(fontSize: 12, color: AppTheme.grey, fontWeight: FontWeight.w500)),
               Text('$completion%', style: const TextStyle(fontSize: 12, color: AppTheme.primary, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: completion / 100,
-            backgroundColor: Colors.grey.shade100,
+            backgroundColor: AppTheme.light,
             color: AppTheme.primary,
             minHeight: 6,
             borderRadius: BorderRadius.circular(3),
@@ -472,9 +467,9 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(
         children: [
-          Icon(isDone ? Icons.check_circle : Icons.circle_outlined, size: 16, color: isDone ? Colors.green : Colors.grey),
+          Icon(isDone ? Icons.check_circle : Icons.circle_outlined, size: 16, color: isDone ? AppTheme.success : AppTheme.grey),
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(fontSize: 12, color: isDone ? Colors.black87 : Colors.grey)),
+          Text(label, style: TextStyle(fontSize: 12, color: isDone ? AppTheme.dark : AppTheme.grey)),
         ],
       ),
     );
@@ -483,9 +478,9 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
   Widget _buildSettingsForm(CustomerResponseModel customer) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppTheme.borderGrey),
       ),
       child: Column(
         children: [
@@ -543,10 +538,10 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: AppTheme.blueLight.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
         child: Icon(icon, color: AppTheme.primary, size: 20),
       ),
-      title: Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+      title: Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.grey, fontWeight: FontWeight.bold)),
       subtitle: _isEditing
           ? Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -555,18 +550,18 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
                 readOnly: readOnly,
                 onTap: onTap,
                 keyboardType: keyboardType,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.dark),
                 decoration: InputDecoration(
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: AppTheme.borderGrey)),
                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: AppTheme.primary)),
                 ),
               ),
             )
           : Text(
               controller.text.isEmpty ? 'Not set' : controller.text,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.dark),
             ),
       trailing: trailingIcon != null
           ? IconButton(icon: Icon(trailingIcon, size: 20, color: AppTheme.primary), onPressed: onTap)
@@ -579,13 +574,13 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: AppTheme.blueLight.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
         child: const Icon(Icons.male_outlined, color: AppTheme.primary, size: 20),
       ),
-      title: const Text('Gender Node', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+      title: const Text('Gender Node', style: TextStyle(fontSize: 10, color: AppTheme.grey, fontWeight: FontWeight.bold)),
       subtitle: _isEditing
           ? DropdownButtonFormField<String>(
-              value: ['MALE', 'FEMALE', 'OTHER'].contains(_genderController.text.toUpperCase())
+              initialValue: ['MALE', 'FEMALE', 'OTHER'].contains(_genderController.text.toUpperCase())
                   ? _genderController.text.toUpperCase()
                   : 'MALE',
               decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
@@ -602,7 +597,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
             )
           : Text(
               _genderController.text.toUpperCase(),
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.dark),
             ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
     );
@@ -613,9 +608,9 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFEFF6FF),
+        color: AppTheme.blueLight.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFDBEAFE)),
+        border: Border.all(color: AppTheme.blueLight.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -631,8 +626,8 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
           _locationMeta('Division Node', customer.divisionName),
           _locationMeta('District Sector', customer.districtName),
           _locationMeta('Police Station', customer.policeStationName),
-          const Divider(color: Color(0xFFDBEAFE), height: 24),
-          const Text('Detailed Dispatch Address HQ', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+          const Divider(color: AppTheme.borderGrey, height: 24),
+          const Text('Detailed Dispatch Address HQ', style: TextStyle(fontSize: 10, color: AppTheme.grey, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           if (_isEditing)
             Padding(
@@ -640,19 +635,19 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
               child: TextField(
                 controller: _addressController,
                 maxLines: 2,
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF1E293B)),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppTheme.dark),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: AppTheme.white,
                   contentPadding: const EdgeInsets.all(10),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: AppTheme.borderGrey)),
                 ),
               ),
             )
           else
             Text(
               _addressController.text.isEmpty ? customer.address : _addressController.text,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF1E293B)),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppTheme.dark),
             ),
         ],
       ),
@@ -664,7 +659,7 @@ class _CustomerProfileScreenState extends ConsumerState<CustomerProfileScreen> {
       padding: const EdgeInsets.only(bottom: 4),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(fontSize: 12, color: Colors.black87),
+          style: const TextStyle(fontSize: 12, color: AppTheme.dark),
           children: [
             TextSpan(text: '$label: ', style: const TextStyle(fontWeight: FontWeight.w500)),
             TextSpan(text: value.isEmpty ? 'N/A' : value, style: const TextStyle(fontWeight: FontWeight.bold)),

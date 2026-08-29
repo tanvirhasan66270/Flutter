@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/entity/supplier_model.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
 import 'package:scm_flutter/suppplier/screen/supplier_form_screen.dart';
@@ -61,8 +60,6 @@ class _SupplierDataScreenState extends ConsumerState<SupplierDataScreen> {
   @override
   Widget build(BuildContext context) {
     final supplierListAsync = ref.watch(supplierListProvider);
-    final currentUser = ref.watch(currentUserProvider);
-    final userRole = (currentUser?.role ?? 'PROCUREMENT').toUpperCase();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -425,7 +422,7 @@ class _SupplierDataScreenState extends ConsumerState<SupplierDataScreen> {
                                       Expanded(
                                         child: Text(
                                           sup.address.isNotEmpty
-                                              ? '${sup.address}${locStr.isNotEmpty ? " • $locStr" : ""}'
+                                              ? '${sup.address}${locStr.isNotEmpty ? " - $locStr" : ""}'
                                               : (locStr.isNotEmpty ? locStr : 'Location N/A'),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,

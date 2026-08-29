@@ -41,4 +41,26 @@ class PaymentRepository {
         .map((e) => PaymentStatementResponse.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// (GET /api/payment-statements)
+  Future<List<PaymentStatementResponse>> findAll() async {
+    try {
+      final res = await _dio.get(ApiConstants.paymentStatements);
+      if (res.statusCode == 204 || res.data == null) return [];
+      return (res.data as List)
+          .map((e) => PaymentStatementResponse.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// (PUT /api/payment-statements/{id}/status?status={status})
+  Future<PaymentStatementResponse> updateStatus(int id, String status) async {
+    final res = await _dio.put(
+      ApiConstants.updatePaymentStatus(id),
+      queryParameters: {'status': status},
+    );
+    return PaymentStatementResponse.fromJson(res.data as Map<String, dynamic>);
+  }
 }

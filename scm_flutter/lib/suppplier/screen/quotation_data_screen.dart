@@ -6,7 +6,6 @@ import 'package:scm_flutter/suppplier/provider/quotation_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
 import 'package:scm_flutter/suppplier/screen/quotation_data_pdf_screen.dart';
 import 'package:scm_flutter/suppplier/screen/register_quotation_screen.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
@@ -75,9 +74,6 @@ class _QuotationDataScreenState extends ConsumerState<QuotationDataScreen> {
     final userRole = (currentUser?.role ?? '').toUpperCase();
     final suppliers = suppliersAsync.value ?? [];
     final currentSupplier = suppliers.where((s) => s.userId == currentUser?.userId).firstOrNull;
-
-    final userName = currentUser?.name ?? 'User';
-    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'U';
 
     return Scaffold(
       backgroundColor: AppTheme.light,
@@ -171,7 +167,7 @@ class _QuotationDataScreenState extends ConsumerState<QuotationDataScreen> {
                   );
 
                   final stateDropdown = DropdownButtonFormField<String>(
-                    value: searchState.isEmpty ? '' : searchState,
+                    initialValue: searchState.isEmpty ? '' : searchState,
                     decoration: _searchDecoration(hint: 'State'),
                     items: const [
                       DropdownMenuItem(value: '', child: Text('All States', style: TextStyle(fontSize: 11))),
@@ -302,7 +298,7 @@ class _QuotationDataScreenState extends ConsumerState<QuotationDataScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: statusColor.withOpacity(0.1),
+                                    color: statusColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(color: statusColor),
                                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/system/notification/notification_provider.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class DynamicNotificationButton extends ConsumerWidget {
   const DynamicNotificationButton({
@@ -32,7 +33,7 @@ class DynamicNotificationButton extends ConsumerWidget {
                   padding: const EdgeInsets.all(3),
                   constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                   decoration: const BoxDecoration(
-                    color: Colors.red,
+                    color: AppTheme.danger,
                     shape: BoxShape.circle,
                   ),
                   child: Text(

@@ -7,7 +7,6 @@ import 'package:scm_flutter/procourment/provider/purchase_order_provider.dart';
 import 'package:scm_flutter/procourment/provider/purchase_requisition_provider.dart';
 import 'package:scm_flutter/suppplier/provider/quotation_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
@@ -147,48 +146,6 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
         ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  Widget _buildTopBar(String userName) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: AppTheme.surfaceWhite,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: AppTheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.local_shipping, color: AppTheme.primary, size: 22),
-              ),
-              const SizedBox(width: 8),
-              const Text('SCM ENTERPRISE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.dark)),
-            ],
-          ),
-          Row(
-            children: [
-              const DynamicNotificationButton(),
-              const SizedBox(width: 4),
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppTheme.primary,
-                child: Text(userName.isNotEmpty ? userName[0].toUpperCase() : 'P', style: const TextStyle(color: AppTheme.surfaceWhite, fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.logout, color: AppTheme.danger, size: 20),
-                onPressed: () {
-                  ref.read(authControllerProvider.notifier).logout();
-                  Navigator.of(context).pushReplacementNamed('/login');
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -592,7 +549,7 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
       {'label': 'Award Quotations', 'icon': Icons.assignment, 'color': AppTheme.warning, 'sub': 'All Quotations', 'route': '/quotations'},
       {'label': 'Manage Suppliers', 'icon': Icons.people, 'color': AppTheme.danger, 'route': '/suppliers'},
       {'label': 'Process Invoices', 'icon': Icons.receipt_long, 'color': AppTheme.info, 'route': '/invoice-portal'},
-      {'label': 'Inventory Status', 'icon': Icons.inventory_2, 'color': AppTheme.success, 'route': '/products'},
+      {'label': 'Inventory Status', 'icon': Icons.inventory_2, 'color': AppTheme.success, 'route': '/inventory-data'},
       {'label': 'RFQ Log', 'icon': Icons.history, 'color': AppTheme.warning, 'sub': '$pendingCount Pending', 'route': '/quotations', 'arguments': 'PENDING'},
       {'label': 'Requisitions', 'icon': Icons.assignment_outlined, 'color': AppTheme.success, 'sub': 'All Requisitions', 'route': '/purchase-requisitions'},
       {'label': 'Purchases', 'icon': Icons.shopping_bag_outlined, 'color': AppTheme.warning, 'sub': 'All Purchases', 'route': '/purchase-orders'},
@@ -769,7 +726,7 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
                         children: [
                           Text(po.poNumber.isNotEmpty ? po.poNumber : 'PO-${po.id}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.dark)),
                           const SizedBox(height: 2),
-                          Text('Total: ৳${_parseNum(po.totalAmount).toStringAsFixed(2)} • Supplier ID: ${po.supplierId}', style: const TextStyle(fontSize: 10, color: AppTheme.secondary)),
+                          Text('Total: ৳${_parseNum(po.totalAmount).toStringAsFixed(2)} | Supplier ID: ${po.supplierId}', style: const TextStyle(fontSize: 10, color: AppTheme.secondary)),
                         ],
                       ),
                     ),
@@ -875,7 +832,7 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
                 children: [
                   const Text('Inventory Critical Shortages', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.dark)),
                   TextButton(
-                    onPressed: () => Navigator.pushNamed(context, '/products'),
+                    onPressed: () => Navigator.pushNamed(context, '/inventory-data'),
                     child: const Text('View Inventory', style: TextStyle(fontSize: 12)),
                   ),
                 ],
@@ -968,7 +925,7 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
             ),
           ),
           _buildNavItem(Icons.notifications, 'Notifications', false, badge: '!', onTap: () => Navigator.pushNamed(context, '/notifications')),
-          _buildNavItem(Icons.more_horiz, 'More', false, onTap: () => Navigator.pushNamed(context, '/profile')),
+          _buildNavItem(Icons.more_horiz, 'More', false, onTap: () => Navigator.pushNamed(context, '/procurement-profile')),
         ],
       ),
     );

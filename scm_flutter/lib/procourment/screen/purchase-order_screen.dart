@@ -131,8 +131,6 @@ class _PurchaseOrderScreenState extends ConsumerState<PurchaseOrderScreen> {
     final String issuedByName = isEdit ? widget.orderToEdit!.issuedByName : (currentUser?.name ?? 'Procurement Officer');
     final int issuedBy = isEdit ? widget.orderToEdit!.issuedBy : (currentUser?.userId ?? 1);
 
-    final userInitial = issuedByName.isNotEmpty ? issuedByName[0].toUpperCase() : 'P';
-
     return Scaffold(
       backgroundColor: AppTheme.light,
       body: SafeArea(
@@ -241,8 +239,8 @@ class _PurchaseOrderScreenState extends ConsumerState<PurchaseOrderScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Target Approved Quotation Slip Dropdown
-                      _buildSectionLabel('TARGET APPROVED QUOTATION SLIP *'),
+                      // Step 1: Target Approved Quotation Slip Dropdown
+                      _buildNumberedStepLabel(1, 'TARGET APPROVED QUOTATION SLIP *'),
                       quotationsAsync.when(
                         data: (quotations) {
                           final approvedQuotations = isEdit
@@ -256,7 +254,7 @@ class _PurchaseOrderScreenState extends ConsumerState<PurchaseOrderScreen> {
                               border: Border.all(color: AppTheme.borderGrey),
                             ),
                             child: DropdownButtonFormField<int>(
-                              value: selectedQuotationId,
+                              initialValue: selectedQuotationId,
                               isExpanded: true,
                               hint: const Text('-- Select Approved Bid Source --', style: TextStyle(fontSize: 12, color: AppTheme.secondary)),
                               decoration: const InputDecoration(
@@ -291,8 +289,8 @@ class _PurchaseOrderScreenState extends ConsumerState<PurchaseOrderScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Financial Settlement Value ($)
-                      _buildSectionLabel('FINANCIAL SETTLEMENT VALUE (\$)'),
+                      // Step 2: Financial Settlement Value ($)
+                      _buildNumberedStepLabel(2, 'FINANCIAL SETTLEMENT VALUE (\$)'),
                       TextFormField(
                         controller: _amountController,
                         keyboardType: TextInputType.number,
@@ -301,111 +299,59 @@ class _PurchaseOrderScreenState extends ConsumerState<PurchaseOrderScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Row: Expected Delivery Date & System Base Currency
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('EXPECTED DELIVERY DATE *'),
-                                TextFormField(
-                                  controller: _dateController,
-                                  readOnly: true,
-                                  onTap: _pickDate,
-                                  decoration: _inputDecoration(icon: Icons.calendar_today_outlined).copyWith(hintText: 'Select delivery date'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildSectionLabel('SYSTEM BASE CURRENCY'),
-                                TextFormField(
-                                  initialValue: 'USD (\$) Fixed SCM',
-                                  readOnly: true,
-                                  enabled: false,
-                                  decoration: _inputDecoration(icon: Icons.currency_exchange),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 3: Expected Delivery Date
+                      _buildNumberedStepLabel(3, 'EXPECTED DELIVERY DATE *'),
+                      TextFormField(
+                        controller: _dateController,
+                        readOnly: true,
+                        onTap: _pickDate,
+                        decoration: _inputDecoration(icon: Icons.calendar_today_outlined).copyWith(hintText: 'Select delivery date'),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Step 4: System Base Currency
+                      _buildNumberedStepLabel(4, 'SYSTEM BASE CURRENCY'),
+                      TextFormField(
+                        initialValue: 'USD (\$) Fixed SCM',
+                        readOnly: true,
+                        enabled: false,
+                        decoration: _inputDecoration(icon: Icons.currency_exchange),
                       ),
                       const SizedBox(height: 20),
 
-                      // Section Title: System Metadata
-                      _buildSectionLabel('SYSTEM METADATA'),
-                      const SizedBox(height: 4),
-
-                      // Supplier Name & Email
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildMetadataLabel('SUPPLIER NAME'),
-                                TextFormField(
-                                  readOnly: true,
-                                  controller: _supplierNameController,
-                                  decoration: _metadataInputDecoration(),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildMetadataLabel('SUPPLIER EMAIL'),
-                                TextFormField(
-                                  readOnly: true,
-                                  controller: _supplierEmailController,
-                                  decoration: _metadataInputDecoration(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 5: Supplier Name
+                      _buildNumberedStepLabel(5, 'SUPPLIER NAME'),
+                      TextFormField(
+                        readOnly: true,
+                        controller: _supplierNameController,
+                        decoration: _metadataInputDecoration(),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
 
-                      // Created At & Issued By
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildMetadataLabel('CREATED AT'),
-                                TextFormField(
-                                  readOnly: true,
-                                  controller: _createdAtController,
-                                  decoration: _metadataInputDecoration(),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildMetadataLabel('ISSUED BY (USER NAME)'),
-                                TextFormField(
-                                  readOnly: true,
-                                  controller: TextEditingController(text: issuedByName),
-                                  decoration: _metadataInputDecoration(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      // Step 6: Supplier Email
+                      _buildNumberedStepLabel(6, 'SUPPLIER EMAIL'),
+                      TextFormField(
+                        readOnly: true,
+                        controller: _supplierEmailController,
+                        decoration: _metadataInputDecoration(),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Step 7: Created At
+                      _buildNumberedStepLabel(7, 'CREATED AT'),
+                      TextFormField(
+                        readOnly: true,
+                        controller: _createdAtController,
+                        decoration: _metadataInputDecoration(),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Step 8: Issued By
+                      _buildNumberedStepLabel(8, 'ISSUED BY (USER NAME)'),
+                      TextFormField(
+                        readOnly: true,
+                        controller: TextEditingController(text: issuedByName),
+                        decoration: _metadataInputDecoration(),
                       ),
                       const SizedBox(height: 24),
 
@@ -504,22 +450,30 @@ class _PurchaseOrderScreenState extends ConsumerState<PurchaseOrderScreen> {
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+
+
+  Widget _buildNumberedStepLabel(int stepNum, String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary),
-      ),
-    );
-  }
-
-  Widget _buildMetadataLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.secondary),
+      child: Row(
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                stepNum.toString(),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondary),
+          ),
+        ],
       ),
     );
   }

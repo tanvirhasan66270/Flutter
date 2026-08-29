@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/entity/productModel.dart';
 import 'package:scm_flutter/product/provider/catagory_provider.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
 
 class ProductScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,7 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         : ref.watch(productsByCategoryIdProvider(selectedCategoryId!));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.light,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

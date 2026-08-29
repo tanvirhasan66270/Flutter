@@ -3,6 +3,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
+import 'package:scm_flutter/them/allAppThim.dart';
 
 class PdfInvoiceGenerator {
   static Future<Uint8List> buildPdf({
@@ -57,7 +58,7 @@ class PdfInvoiceGenerator {
                     pw.Text(
                       'OFFICIAL INVOICE',
                       style: pw.TextStyle(
-                        color: PdfColor.fromHex('#2563EB'),
+                        color: PdfColor.fromInt(AppTheme.blue.toARGB32()),
                         fontSize: 22,
                         fontWeight: pw.FontWeight.bold,
                       ),
@@ -72,21 +73,40 @@ class PdfInvoiceGenerator {
                     ),
                   ],
                 ),
-                pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColor.fromHex('#DCFCE7'),
-                    border: pw.Border.all(color: PdfColor.fromHex('#86EFAC')),
-                    borderRadius: pw.BorderRadius.circular(4),
-                  ),
-                  child: pw.Text(
-                    order.paymentStatus,
-                    style: pw.TextStyle(
-                      fontSize: 9,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColor.fromHex('#166534'),
+                pw.Row(
+                  children: [
+                    pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColor.fromHex('#DCFCE7'),
+                        border: pw.Border.all(color: PdfColor.fromHex('#86EFAC')),
+                        borderRadius: pw.BorderRadius.circular(4),
+                      ),
+                      child: pw.Text(
+                        order.paymentStatus,
+                        style: pw.TextStyle(
+                          fontSize: 9,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColor.fromHex('#166534'),
+                        ),
+                      ),
                     ),
-                  ),
+                    pw.SizedBox(width: 10),
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(3),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColors.white,
+                        border: pw.Border.all(color: PdfColors.grey300),
+                        borderRadius: pw.BorderRadius.circular(4),
+                      ),
+                      child: pw.BarcodeWidget(
+                        barcode: pw.Barcode.qrCode(),
+                        data: 'ORDER:${order.orderNumber}|VAL:${order.totalAmount}|STATUS:${order.status}|PAY:${order.paymentStatus}',
+                        width: 44,
+                        height: 44,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -163,8 +183,8 @@ class PdfInvoiceGenerator {
                         _buildTd(index.toString(), align: pw.Alignment.center, isBold: true),
                         _buildTd(item.productName, align: pw.Alignment.centerLeft),
                         _buildTd(item.quantity.toString(), align: pw.Alignment.center),
-                        _buildTd('৳${item.unitPrice.toStringAsFixed(2)}', align: pw.Alignment.centerRight),
-                        _buildTd('৳${item.lineTotal.toStringAsFixed(2)}', align: pw.Alignment.centerRight, isBold: true, textColor: PdfColor.fromHex('#2563EB')),
+                        _buildTd('BDT ${item.unitPrice.toStringAsFixed(2)}', align: pw.Alignment.centerRight),
+                        _buildTd('BDT ${item.lineTotal.toStringAsFixed(2)}', align: pw.Alignment.centerRight, isBold: true, textColor: PdfColor.fromHex('#2563EB')),
                       ],
                     );
                   }),
@@ -185,11 +205,11 @@ class PdfInvoiceGenerator {
                       1: const pw.FlexColumnWidth(2.5),
                     },
                     children: [
-                      _buildFinRow('Subtotal:', '৳${order.itemSubtotal.toStringAsFixed(2)}'),
-                      _buildFinRow('Shipping Fees:', '৳${order.deliveryCharge.toStringAsFixed(2)}'),
-                      _buildFinRow('Grand Total:', '৳${order.totalAmount.toStringAsFixed(2)}', isBold: true, textColor: PdfColor.fromHex('#2563EB'), bg: PdfColor.fromHex('#F0F7FF')),
-                      _buildFinRow('Total Paid:', '৳${totalPaidNum.toStringAsFixed(2)}', isBold: true, textColor: PdfColors.green700, bg: PdfColor.fromHex('#F0FDF4')),
-                      _buildFinRow('Balance Due:', '৳${totalDueNum.toStringAsFixed(2)}', isBold: true, textColor: PdfColor.fromHex('#991B1B'), bg: PdfColor.fromHex('#FEF2F2')),
+                      _buildFinRow('Subtotal:', 'BDT ${order.itemSubtotal.toStringAsFixed(2)}'),
+                      _buildFinRow('Shipping Fees:', 'BDT ${order.deliveryCharge.toStringAsFixed(2)}'),
+                      _buildFinRow('Grand Total:', 'BDT ${order.totalAmount.toStringAsFixed(2)}', isBold: true, textColor: PdfColor.fromHex('#2563EB'), bg: PdfColor.fromHex('#F0F7FF')),
+                      _buildFinRow('Total Paid:', 'BDT ${totalPaidNum.toStringAsFixed(2)}', isBold: true, textColor: PdfColors.green700, bg: PdfColor.fromHex('#F0FDF4')),
+                      _buildFinRow('Balance Due:', 'BDT ${totalDueNum.toStringAsFixed(2)}', isBold: true, textColor: PdfColor.fromHex('#991B1B'), bg: PdfColor.fromHex('#FEF2F2')),
                     ],
                   ),
                 ),
