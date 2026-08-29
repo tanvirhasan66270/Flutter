@@ -158,7 +158,7 @@ class _QCDashboardScreenState extends ConsumerState<QCDashboardScreen> {
                               const SizedBox(height: 4),
                               const Text(
                                 'QC Inspector - Quality Compliance & Inspection Matrix Console',
-                                style: TextStyle(color: Colors.white70, fontSize: 11),
+                                style: TextStyle(color: AppTheme.white, fontSize: 11),
                               ),
                             ],
                           ),

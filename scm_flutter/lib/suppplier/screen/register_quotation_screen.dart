@@ -187,15 +187,15 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
-                color: const Color(0xFFFEF2F2),
+                color: AppTheme.dangerLight,
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                    const Icon(Icons.error_outline, color: AppTheme.danger, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: AppTheme.danger, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -240,7 +240,7 @@ class _RegisterQuotationScreenState extends ConsumerState<RegisterQuotationScree
                         TextFormField(
                           readOnly: true,
                           initialValue: '$currentSupplierName (Your Supplier Account)',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF2563EB)),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
                           decoration: _inputDecoration(),
                         )
                       else

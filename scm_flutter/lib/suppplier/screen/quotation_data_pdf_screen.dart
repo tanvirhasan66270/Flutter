@@ -208,11 +208,11 @@ class QuotationDataPDFScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Quotation Document #$qtnNo',
-          style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
+          style: const TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.surfaceWhite,
         elevation: 0,
-        leading: const BackButton(color: Colors.black87),
+        leading: const BackButton(color: AppTheme.dark),
         actions: const [
           DynamicNotificationButton(),
         ],

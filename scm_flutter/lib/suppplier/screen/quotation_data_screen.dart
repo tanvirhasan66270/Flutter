@@ -91,7 +91,7 @@ class _QuotationDataScreenState extends ConsumerState<QuotationDataScreen> {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF2563EB), Color(0xFF1D4ED8), Color(0xFF4F46E5)],
+                  colors: [AppTheme.primary, AppTheme.primaryDark, AppTheme.indigoDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -107,21 +107,21 @@ class _QuotationDataScreenState extends ConsumerState<QuotationDataScreen> {
                           children: [
                             GestureDetector(
                               onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                              child: const Icon(Icons.arrow_back, color: AppTheme.white, size: 20),
                             ),
                             const SizedBox(width: 8),
                             const Text(
                               'Supplier Quotation Matrix',
-                              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: AppTheme.white, fontSize: 17, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 28.0),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 28.0),
                           child: Text(
                             'Log supplier bids, trace PR reference nodes, and analyze procurement price layouts',
-                            style: TextStyle(color: Colors.white70, fontSize: 11),
+                            style: TextStyle(color: AppTheme.white.withValues(alpha: 0.7), fontSize: 11),
                           ),
                         ),
                       ],
@@ -130,11 +130,11 @@ class _QuotationDataScreenState extends ConsumerState<QuotationDataScreen> {
                   if (userRole == 'SUPPLIER')
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.25),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppTheme.white.withValues(alpha: 0.25),
+                        foregroundColor: AppTheme.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: Colors.white54)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: BorderSide(color: AppTheme.white.withValues(alpha: 0.5))),
                       ),
                       icon: const Icon(Icons.upload_file, size: 16),
                       label: const Text('Upload Bid', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),

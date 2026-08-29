@@ -91,7 +91,7 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF2563EB), Color(0xFF1D4ED8), Color(0xFF4F46E5)],
+                  colors: [AppTheme.primary, AppTheme.primaryDark, AppTheme.indigoDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -107,21 +107,21 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
                           children: [
                             GestureDetector(
                               onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                              child: const Icon(Icons.arrow_back, color: AppTheme.white, size: 20),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               isEdit ? 'Modify Supplier Profile' : 'Register New Vendor / Supplier',
-                              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: AppTheme.white, fontSize: 17, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 28.0),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 28.0),
                           child: Text(
                             'Onboard corporate vendor profiles and configure logistic parameters',
-                            style: TextStyle(color: Colors.white70, fontSize: 11),
+                            style: TextStyle(color: AppTheme.white.withValues(alpha: 0.7), fontSize: 11),
                           ),
                         ),
                       ],
@@ -136,7 +136,7 @@ class _SupplierFormScreenState extends ConsumerState<SupplierFormScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: AppTheme.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.white54),
                           ),

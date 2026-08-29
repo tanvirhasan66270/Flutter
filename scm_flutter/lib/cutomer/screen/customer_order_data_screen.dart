@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
+import 'package:scm_flutter/auth/authProvider.dart';
+import 'package:scm_flutter/cutomer/provider/customer_provider.dart' hide customerOrderRepositoryProvider;
+import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
+import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/cutomer/screen/customer_order_pdf_screen.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
@@ -61,9 +64,89 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
     }
   }
 
+  void _openOrderStatusUpdateDialog(BuildContext context, CustomerOrderResponse order) {
+    final currentUser = ref.read(currentUserProvider);
+    final userRole = currentUser?.role.toUpperCase() ?? '';
+    final canUpdateStatus = ['SALES_OFFICER', 'ROLE_SALES_OFFICER', 'SALES', 'MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].contains(userRole);
+    if (!canUpdateStatus) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permission denied: Only Sales Officers, Managers, and Admins can update order status.'), backgroundColor: AppTheme.danger),
+      );
+      return;
+    }
+
+    String selectedStatus = order.status;
+    final availableStatuses = [
+      'PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED',
+      'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'RETURNED', 'REFUNDED'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text('Update Customer Order Status', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Order: ${order.orderNumber}', style: const TextStyle(fontSize: 11, color: AppTheme.grey, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedStatus,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  ),
+                  items: availableStatuses.map((st) => DropdownMenuItem(
+                    value: st,
+                    child: Text(st, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  )).toList(),
+                  onChanged: (val) {
+                    if (val != null) setDialogState(() => selectedStatus = val);
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  try {
+                    final repo = ref.read(customerOrderRepositoryProvider);
+                    await repo.updateOrderStatus(order.id, selectedStatus);
+                    ref.invalidate(myCustomerOrdersProvider);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Order status updated successfully!'), backgroundColor: AppTheme.success),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error updating status: $e'), backgroundColor: AppTheme.danger),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Save Status', style: TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final myOrdersAsync = ref.watch(myCustomerOrdersProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final userRole = currentUser?.role.toUpperCase() ?? '';
+    final canUpdateStatus = ['SALES_OFFICER', 'ROLE_SALES_OFFICER', 'SALES', 'MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].contains(userRole);
 
     return Scaffold(
       backgroundColor: AppTheme.light,
@@ -122,15 +205,10 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
               return matchesSearch && matchesStatus;
             }).toList();
 
-            // Calculate metrics totals
-            double totalVal = 0;
-            double paidVal = 0;
-            double dueVal = 0;
-            for (var o in orders) {
-              totalVal += o.totalAmount;
-              paidVal += _parseNum(o.paidAmount);
-              dueVal += _parseNum(o.dueAmount);
-            }
+            // Calculate status metrics counts
+            final int pendingCount = orders.where((o) => o.status.toUpperCase() == 'PENDING').length;
+            final int confirmedCount = orders.where((o) => o.status.toUpperCase() == 'CONFIRMED').length;
+            final int deliveredCount = orders.where((o) => o.status.toUpperCase() == 'DELIVERED').length;
 
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -170,13 +248,13 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                               child: _buildBannerMetric('Total Orders', '${orders.length}', AppTheme.white),
                             ),
                             Expanded(
-                              child: _buildBannerMetric('Total Value', '৳${totalVal.toStringAsFixed(0)}', AppTheme.blueLight),
+                              child: _buildBannerMetric('Pending', '$pendingCount', AppTheme.warning),
                             ),
                             Expanded(
-                              child: _buildBannerMetric('Paid Amount', '৳${paidVal.toStringAsFixed(0)}', AppTheme.success),
+                              child: _buildBannerMetric('Confirmed', '$confirmedCount', AppTheme.blueLight),
                             ),
                             Expanded(
-                              child: _buildBannerMetric('Due Balance', '৳${dueVal.toStringAsFixed(0)}', AppTheme.danger),
+                              child: _buildBannerMetric('Delivered', '$deliveredCount', AppTheme.success),
                             ),
                           ],
                         ),
@@ -513,6 +591,21 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
                                                 );
                                               },
                                             ),
+                                            if (canUpdateStatus) ...[
+                                              const SizedBox(width: 6),
+                                              // Update Status Button (Restricted to SALES_OFFICER, MANAGER, ADMIN)
+                                              OutlinedButton.icon(
+                                                style: OutlinedButton.styleFrom(
+                                                  foregroundColor: AppTheme.warning,
+                                                  side: const BorderSide(color: AppTheme.warning),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                ),
+                                                icon: const Icon(Icons.edit_note, size: 14),
+                                                label: const Text('Status', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                                onPressed: () => _openOrderStatusUpdateDialog(context, order),
+                                              ),
+                                            ],
                                             if (due > 0) ...[
                                               const SizedBox(width: 6),
                                               // Pay Due Button

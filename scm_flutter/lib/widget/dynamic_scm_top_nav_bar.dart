@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
+import 'package:scm_flutter/sales_officer/provider/sales_officer_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
@@ -21,14 +22,23 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
   @override
   Size get preferredSize => const Size.fromHeight(60.0);
 
-  String _resolveImageUrl(String? rawUrl) {
+  String _resolveImageUrl(String? rawUrl, {String subFolder = 'sales_officer'}) {
     if (rawUrl == null || rawUrl.trim().isEmpty) return '';
     final trimmed = rawUrl.trim();
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
       return trimmed;
     }
     final cleanPath = trimmed.startsWith('/') ? trimmed.substring(1) : trimmed;
-    return 'http://${ApiConstants.host}:8085/$cleanPath';
+    if (cleanPath.startsWith('images/')) {
+      return 'http://${ApiConstants.host}:8085/$cleanPath';
+    }
+    if (cleanPath.startsWith('sales_officer/') ||
+        cleanPath.startsWith('supplier/') ||
+        cleanPath.startsWith('product/') ||
+        cleanPath.startsWith('customer/')) {
+      return '${ApiConstants.imgUrl}$cleanPath';
+    }
+    return '${ApiConstants.imgUrl}$subFolder/$cleanPath';
   }
 
   @override
@@ -39,13 +49,19 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
         ? rawName.substring(0, 2).toUpperCase()
         : (rawName.isNotEmpty ? rawName.toUpperCase() : 'US');
 
-    // Resolve avatar image from supplier directory or user profile
+    // Resolve avatar image from sales officer, supplier directory, or user profile
     String avatarUrl = '';
-    final suppliersAsync = ref.watch(supplierListProvider);
-    final suppliers = suppliersAsync.value ?? [];
-    final currentSupplier = suppliers.where((s) => s.userId == currentUser?.userId).firstOrNull;
-    if (currentSupplier != null && currentSupplier.image.isNotEmpty) {
-      avatarUrl = _resolveImageUrl(currentSupplier.image);
+    final salesOfficerAsync = ref.watch(currentSalesOfficerProvider);
+    final currentSalesOfficer = salesOfficerAsync.value;
+    if (currentSalesOfficer != null && currentSalesOfficer.image.isNotEmpty) {
+      avatarUrl = _resolveImageUrl(currentSalesOfficer.image, subFolder: 'sales_officer');
+    } else {
+      final suppliersAsync = ref.watch(supplierListProvider);
+      final suppliers = suppliersAsync.value ?? [];
+      final currentSupplier = suppliers.where((s) => s.userId == currentUser?.userId).firstOrNull;
+      if (currentSupplier != null && currentSupplier.image.isNotEmpty) {
+        avatarUrl = _resolveImageUrl(currentSupplier.image, subFolder: 'supplier');
+      }
     }
 
     return Container(
@@ -107,7 +123,9 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                   onSelected: (value) async {
                     if (value == 'profile') {
                       final role = currentUser?.role.toUpperCase() ?? '';
-                      if (role.contains('PROCUREMENT') || role.contains('LOGISTICS') || role.contains('OFFICER')) {
+                      if (role.contains('SALES')) {
+                        Navigator.pushNamed(context, '/sales-officer-profile');
+                      } else if (role.contains('PROCUREMENT') || role.contains('LOGISTICS')) {
                         Navigator.pushNamed(context, '/procurement-profile');
                       } else if (role.contains('DRIVER')) {
                         Navigator.pushNamed(context, '/driver-profile');
@@ -166,15 +184,39 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                     ),
                   ],
                   child: CircleAvatar(
-                    radius: 14,
-                    backgroundColor: const Color(0xFF2563EB),
-                    backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                    child: avatarUrl.isEmpty
-                        ? Text(
-                            userInitials,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
+                    radius: 15,
+                    backgroundColor: AppTheme.primary,
+                    child: avatarUrl.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(
+                              avatarUrl,
+                              width: 30,
+                              height: 30,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Text(
+                                    userInitials,
+                                    style: const TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold, fontSize: 10),
+                                  ),
+                                );
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: SizedBox(
+                                    width: 10,
+                                    height: 10,
+                                    child: CircularProgressIndicator(strokeWidth: 1.5, color: AppTheme.white),
+                                  ),
+                                );
+                              },
+                            ),
                           )
-                        : null,
+                        : Text(
+                            userInitials,
+                            style: const TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold, fontSize: 10),
+                          ),
                   ),
                 ),
 
@@ -213,7 +255,9 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                         break;
                       case 'profile':
                         final role = currentUser?.role.toUpperCase() ?? '';
-                        if (role.contains('PROCUREMENT') || role.contains('LOGISTICS') || role.contains('OFFICER')) {
+                        if (role.contains('SALES')) {
+                          Navigator.pushNamed(context, '/sales-officer-profile');
+                        } else if (role.contains('PROCUREMENT') || role.contains('LOGISTICS')) {
                           Navigator.pushNamed(context, '/procurement-profile');
                         } else if (role.contains('DRIVER')) {
                           Navigator.pushNamed(context, '/driver-profile');

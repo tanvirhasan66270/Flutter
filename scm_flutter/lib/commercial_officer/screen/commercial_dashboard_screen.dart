@@ -20,14 +20,10 @@ import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
 import 'package:scm_flutter/system/notification/notification_provider.dart';
 import 'package:scm_flutter/commercial_officer/screen/letter_of_credit_form_screen.dart';
 import 'package:scm_flutter/commercial_officer/screen/letter_of_credit_data_screen.dart';
-import 'package:scm_flutter/commercial_officer/screen/lc_bank_data_screen.dart';
-import 'package:scm_flutter/commercial_officer/screen/lc_bank_form_screen.dart';
 import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_data_screen.dart';
-import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_form_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_order_data_screen.dart';
 import 'package:scm_flutter/procourment/screen/shipment_data_screen.dart';
 import 'package:scm_flutter/commercial_officer/screen/customer_payment_data_screen.dart';
-import 'package:scm_flutter/commercial_officer/screen/customer_payment_pdf_screen.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
@@ -76,8 +72,6 @@ class _CommercialDashboardScreenState extends ConsumerState<CommercialDashboardS
     final lineItemsAsync = ref.watch(poLineItemListProvider);
     final customerOrdersAsync = ref.watch(customerOrderListProvider);
     final notificationsAsync = ref.watch(notificationListProvider);
-    final poListAsync = ref.watch(purchaseOrderListProvider);
-    final supplierListAsync = ref.watch(supplierListProvider);
 
     final userName = currentUser?.name.isNotEmpty == true ? currentUser!.name : 'Commercial Officer';
     final lcs = lcsAsync.value ?? [];
@@ -1332,21 +1326,6 @@ class _CommercialDashboardScreenState extends ConsumerState<CommercialDashboardS
         actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))],
       ),
     );
-  }
-
-  // ── MODAL 3: CUSTOMER ORDERS MASTER VIEW ─────────────────────────────
-  void _openCustomerOrdersModal(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomerOrderDataScreen()));
-  }
-
-  // ── MODAL 4: COMMERCIAL INVOICE MASTER VIEW ──────────────────────────
-  void _openInvoiceModal(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const CommercialInvoiceDataScreen()));
-  }
-
-  // ── MODAL 5: SHIPPING & CARGO MASTER VIEW ────────────────────────────
-  void _openShippingModal(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const ShipmentDataScreen()));
   }
 
   // ── MODAL 6: CUSTOMER PAYMENT VERIFICATION ───────────────────────────

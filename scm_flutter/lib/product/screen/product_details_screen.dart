@@ -35,15 +35,15 @@ class ProductDetailsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppTheme.light,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.surfaceWhite,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back, color: AppTheme.dark),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Product Details',
-          style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppTheme.dark, fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -56,7 +56,7 @@ class ProductDetailsScreen extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     product.name,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.dark),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -65,18 +65,18 @@ class ProductDetailsScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isAvailable ? Colors.green.shade50 : Colors.red.shade50,
+                    color: isAvailable ? AppTheme.successLight : AppTheme.dangerLight,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: isAvailable ? Colors.green.shade200 : Colors.red.shade200),
+                    border: Border.all(color: isAvailable ? AppTheme.success.withValues(alpha: 0.3) : AppTheme.danger.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(radius: 4, backgroundColor: isAvailable ? Colors.green : Colors.red),
+                      CircleAvatar(radius: 4, backgroundColor: isAvailable ? AppTheme.success : AppTheme.danger),
                       const SizedBox(width: 6),
                       Text(
                         isAvailable ? 'Available In Stock' : 'Out of Stock',
-                        style: TextStyle(color: isAvailable ? Colors.green.shade700 : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: isAvailable ? AppTheme.success : AppTheme.danger, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -88,7 +88,7 @@ class ProductDetailsScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 'SKU: ${product.productCode}',
-                style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: AppTheme.grey, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 16),
@@ -96,9 +96,9 @@ class ProductDetailsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surfaceWhite,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppTheme.borderGrey),
               ),
               child: Column(
                 children: [
@@ -106,26 +106,26 @@ class ProductDetailsScreen extends ConsumerWidget {
                     height: 220,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: AppTheme.light,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: imageUrl.isNotEmpty
                         ? Image.network(
                             imageUrl,
                             fit: BoxFit.contain,
-                            errorBuilder: (ctx, err, st) => const Icon(Icons.inventory_2_outlined, size: 60, color: Colors.grey),
+                            errorBuilder: (ctx, err, st) => const Icon(Icons.inventory_2_outlined, size: 60, color: AppTheme.grey),
                           )
-                        : const Icon(Icons.inventory_2_outlined, size: 60, color: Colors.grey),
+                        : const Icon(Icons.inventory_2_outlined, size: 60, color: AppTheme.grey),
                   ),
                   const SizedBox(height: 16),
 
-                  _buildInfoRow(Icons.qr_code, 'Product Code', product.productCode, Colors.blue),
+                  _buildInfoRow(Icons.qr_code, 'Product Code', product.productCode, AppTheme.primary),
                   const Divider(height: 24),
-                  _buildInfoRow(Icons.inventory_2, 'Name', product.name, Colors.green),
+                  _buildInfoRow(Icons.inventory_2, 'Name', product.name, AppTheme.success),
                   const Divider(height: 24),
-                  _buildInfoRow(Icons.category, 'Category ID', '${product.categoryId}', Colors.indigo),
+                  _buildInfoRow(Icons.category, 'Category ID', '${product.categoryId}', AppTheme.indigo),
                   const Divider(height: 24),
-                  _buildInfoRow(Icons.sell_outlined, 'Price', '৳${product.sellingPrice.toStringAsFixed(2)}', const Color(0xFF2563EB)),
+                  _buildInfoRow(Icons.sell_outlined, 'Price', '৳${product.sellingPrice.toStringAsFixed(2)}', AppTheme.primary),
                 ],
               ),
             ),
@@ -136,15 +136,15 @@ class ProductDetailsScreen extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E3A8A),
+                  color: AppTheme.primaryDark,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.list_alt, color: Colors.white, size: 16),
+                    Icon(Icons.list_alt, color: AppTheme.white, size: 16),
                     SizedBox(width: 6),
-                    Text('PRODUCT SPECIFICATIONS', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('PRODUCT SPECIFICATIONS', style: TextStyle(color: AppTheme.white, fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -154,23 +154,23 @@ class ProductDetailsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.surfaceWhite,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppTheme.borderGrey),
               ),
               child: Column(
                 children: [
-                  _buildDetailRow(Icons.shopping_bag_outlined, 'Stock Quantity', '${product.quantity}', Colors.blue),
+                  _buildDetailRow(Icons.shopping_bag_outlined, 'Stock Quantity', '${product.quantity}', AppTheme.primary),
                   const Divider(height: 24),
-                  _buildDetailRow(Icons.balance, 'Weight', '${product.weight} kg', Colors.green),
+                  _buildDetailRow(Icons.balance, 'Weight', '${product.weight} kg', AppTheme.success),
                   const Divider(height: 24),
-                  _buildDetailRow(Icons.attach_money, 'Unit Cost', '৳${product.unitCost.toStringAsFixed(2)}', Colors.blue),
+                  _buildDetailRow(Icons.attach_money, 'Unit Cost', '৳${product.unitCost.toStringAsFixed(2)}', AppTheme.primary),
                   const Divider(height: 24),
-                  _buildDetailRow(Icons.sell_outlined, 'Selling Price', '৳${product.sellingPrice.toStringAsFixed(2)}', Colors.green),
+                  _buildDetailRow(Icons.sell_outlined, 'Selling Price', '৳${product.sellingPrice.toStringAsFixed(2)}', AppTheme.success),
                   const Divider(height: 24),
-                  _buildDetailRow(Icons.refresh, 'Reorder Point', '${product.reorderPoint}', Colors.purple),
+                  _buildDetailRow(Icons.refresh, 'Reorder Point', '${product.reorderPoint}', AppTheme.purple),
                   const Divider(height: 24),
-                  _buildDetailRow(Icons.check_circle_outline, 'Availability Status', isAvailable ? 'AVAILABLE' : 'OUT OF STOCK', Colors.teal),
+                  _buildDetailRow(Icons.check_circle_outline, 'Availability Status', isAvailable ? 'AVAILABLE' : 'OUT OF STOCK', AppTheme.teal),
                 ],
               ),
             ),
@@ -182,8 +182,8 @@ class ProductDetailsScreen extends ConsumerWidget {
               height: 48,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2563EB),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 icon: const Icon(Icons.shopping_cart, size: 18),
@@ -209,12 +209,12 @@ class ProductDetailsScreen extends ConsumerWidget {
           child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(width: 12),
-        SizedBox(width: 100, child: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13))),
+        SizedBox(width: 100, child: Text(label, style: const TextStyle(color: AppTheme.grey, fontSize: 13))),
         Expanded(
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.dark),
           ),
         ),
       ],
@@ -233,14 +233,14 @@ class ProductDetailsScreen extends ConsumerWidget {
           child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(width: 12),
-        Expanded(child: Text(label, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500))),
-        const Text(':  ', style: TextStyle(color: Colors.grey)),
+        Expanded(child: Text(label, style: const TextStyle(color: AppTheme.dark, fontSize: 13, fontWeight: FontWeight.w500))),
+        const Text(':  ', style: TextStyle(color: AppTheme.grey)),
         Text(
           value,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 13,
-            color: isGreen ? Colors.green : (isRed ? Colors.red : Colors.black87),
+            color: isGreen ? AppTheme.success : (isRed ? AppTheme.danger : AppTheme.dark),
           ),
         ),
       ],

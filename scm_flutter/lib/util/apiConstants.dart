@@ -81,14 +81,15 @@ class ApiConstants {
 
 
   // ── Address hierarchy ────────────────────────────────────
-  static const String country = 'country/';
+  static const String country = 'country';
   static String divisionsByCountry(int countryId) =>
       'division/country/$countryId';
-  static String districtsByDivision(int divisionId) => 'district/$divisionId';
+  static String districtsByDivision(int divisionId) =>
+      'district/division/$divisionId';
   static String policeStationsByDistrict(int districtId) =>
-      'policeStation/district/$districtId';
+      'policestation/district/$districtId';
   static String policeStationSearch(String keyword) =>
-      'policeStation/search?keyword=$keyword';
+      'policestation/search?keyword=$keyword';
 
 
   // Category Endpoints ( @RequestMapping("/api/category") )

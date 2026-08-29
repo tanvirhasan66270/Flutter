@@ -34,9 +34,9 @@ class NotificationScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.notifications_off_outlined, size: 64, color: Colors.grey),
+                  Icon(Icons.notifications_off_outlined, size: 64, color: AppTheme.grey),
                   SizedBox(height: 12),
-                  Text('No notifications yet', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                  Text('No notifications yet', style: TextStyle(color: AppTheme.grey, fontSize: 16)),
                 ],
               ),
             );
@@ -53,12 +53,12 @@ class NotificationScreen extends ConsumerWidget {
               final int? id = item['id'];
 
               return ListTile(
-                tileColor: isRead ? Colors.transparent : Colors.blue.withValues(alpha: 0.05),
+                tileColor: isRead ? Colors.transparent : AppTheme.primary.withValues(alpha: 0.05),
                 leading: CircleAvatar(
                   backgroundColor: isRead ? AppTheme.borderGrey : AppTheme.primary,
                   child: Icon(
                     isRead ? Icons.notifications_none : Icons.notifications_active,
-                    color: isRead ? Colors.grey.shade700 : Colors.white,
+                    color: isRead ? AppTheme.secondary : AppTheme.white,
                     size: 20,
                   ),
                 ),

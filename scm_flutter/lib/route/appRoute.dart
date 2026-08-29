@@ -11,6 +11,7 @@ import 'package:scm_flutter/cutomer/screen/customer_order_data_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_order_screen.dart';
 import 'package:scm_flutter/cutomer/screen/customer_oredr_track_page.dart';
 import 'package:scm_flutter/cutomer/screen/customer_profile_screen.dart';
+import 'package:scm_flutter/cutomer/screen/customer_register_screen.dart';
 import 'package:scm_flutter/driver/screen/driver_dashboard_screen.dart';
 import 'package:scm_flutter/driver/screen/driver_profile_screen.dart';
 import 'package:scm_flutter/entity/productModel.dart';
@@ -59,6 +60,7 @@ import 'package:scm_flutter/suppplier/screen/supplier_form_screen.dart';
 import 'package:scm_flutter/system/massage/chat_workspace_screen.dart';
 import 'package:scm_flutter/system/notification/notification_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_dashboard_screen.dart';
+import 'package:scm_flutter/sales_officer/screen/sales_dashboard_screen.dart';
 import 'package:scm_flutter/sales_officer/screen/sales_officer_profile_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_pdf_screen.dart';
@@ -82,6 +84,11 @@ import 'package:scm_flutter/logistics_officer/screen/delivery_trip_pdf_screen.da
 import 'package:scm_flutter/entity/vehicle_model.dart';
 import 'package:scm_flutter/logistics_officer/screen/vehicle_data_screen.dart';
 import 'package:scm_flutter/logistics_officer/screen/vehicle_form_screen.dart';
+import 'package:scm_flutter/entity/catagory_model.dart';
+import 'package:scm_flutter/sales_officer/screen/category_form_screen.dart';
+import 'package:scm_flutter/sales_officer/screen/product_form_screen.dart';
+import 'package:scm_flutter/product/screen/category_data_screen.dart';
+import 'package:scm_flutter/product/screen/product_data_screen.dart';
 
 /// App routing & role redirection manager.
 class AppRouter {
@@ -101,6 +108,13 @@ class AppRouter {
           builder: (_) => const ForgotPasswordScreen(),
           settings: settings,
         );
+      case '/register':
+      case '/customer-register':
+        return MaterialPageRoute(
+          builder: (_) => const CustomerRegisterScreen(),
+          settings: settings,
+        );
+
       case '/verify-email':
         final token = (settings.arguments as Map?)?['token'] as String? ?? '';
         return MaterialPageRoute(
@@ -137,6 +151,14 @@ class AppRouter {
       case '/customer-order':
         return MaterialPageRoute(
           builder: (_) => const _RequireAuth(child: CustomerOrderScreen()),
+          settings: settings,
+        );
+
+      case '/sales-dashboard':
+      case '/sales-officer-dashboard':
+      case '/sales':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: SalesDashboardScreen()),
           settings: settings,
         );
 
@@ -249,8 +271,9 @@ class AppRouter {
         );
 
       case '/purchase-orders':
+        final statusArg = settings.arguments as String?;
         return MaterialPageRoute(
-          builder: (_) => const _RequireAuth(child: PurchaseOrderDataScreen()),
+          builder: (_) => _RequireAuth(child: PurchaseOrderDataScreen(initialStatus: statusArg)),
           settings: settings,
         );
 
@@ -534,6 +557,36 @@ class AppRouter {
           settings: settings,
         );
 
+      case '/category-form':
+      case '/category-create':
+        final categoryToEdit = settings.arguments as CategoryResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: CategoryFormScreen(categoryToEdit: categoryToEdit)),
+          settings: settings,
+        );
+
+      case '/product-form':
+      case '/product-create':
+        final productToEdit = settings.arguments as ProductResponseModel?;
+        return MaterialPageRoute(
+          builder: (_) => _RequireAuth(child: ProductFormScreen(productToEdit: productToEdit)),
+          settings: settings,
+        );
+
+      case '/category-data':
+      case '/categories':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: CategoryDataScreen()),
+          settings: settings,
+        );
+
+      case '/product-data':
+      case '/product-list':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: ProductDataScreen()),
+          settings: settings,
+        );
+
       case '/':
       default:
         return MaterialPageRoute(
@@ -586,10 +639,10 @@ class RoleRedirectScreen extends ConsumerWidget {
           case 'LOGISTICS_OFFICER':
           case 'ROLE_LOGISTICS_OFFICER':
             return const LogisticsOfficerDashboardScreen();
+          case 'SALES':
           case 'SALES_OFFICER':
           case 'ROLE_SALES_OFFICER':
-            // For now, redirect to profile or a dashboard if it exists
-            return const SalesOfficerProfileScreen();
+            return const SalesDashboardScreen();
           default:
             return const LoginScreen();
         }

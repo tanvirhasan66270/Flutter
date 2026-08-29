@@ -155,7 +155,7 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
     final qtyInvalid = _isQtyInvalid(selectedPo, allShipments);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bgLight,
       body: SafeArea(
         child: Column(
           children: [
@@ -173,15 +173,15 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
-                color: const Color(0xFFFEF2F2),
+                color: AppTheme.dangerLight,
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                    const Icon(Icons.error_outline, color: AppTheme.danger, size: 18),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: AppTheme.danger, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

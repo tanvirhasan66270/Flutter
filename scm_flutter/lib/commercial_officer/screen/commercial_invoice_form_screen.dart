@@ -88,10 +88,10 @@ class _CommercialInvoiceFormScreenState extends ConsumerState<CommercialInvoiceF
     setState(() {
       _selectedCustomerOrderId = order.id;
       _subtotalController.text = order.totalAmount.toStringAsFixed(2);
-      _paidAmountController.text = (order.paidAmount ?? 0).toStringAsFixed(2);
-      _deliveryAddressController.text = order.deliveryAddress ?? '';
-      if (order.paymentMethod != null && order.paymentMethod!.isNotEmpty) {
-        _paymentMethod = order.paymentMethod!;
+      _paidAmountController.text = order.paidAmount.toStringAsFixed(2);
+      _deliveryAddressController.text = order.deliveryAddress;
+      if (order.paymentMethod.isNotEmpty) {
+        _paymentMethod = order.paymentMethod;
       }
       _recalculateDiscountPct();
     });

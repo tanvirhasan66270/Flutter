@@ -5,8 +5,6 @@ import 'package:scm_flutter/auth/helperProvider.dart';
 import 'package:scm_flutter/commercial_officer/data/letter_of_credit_repository.dart';
 import 'package:scm_flutter/entity/letter_of_cradit_model.dart';
 
-import 'package:scm_flutter/util/apiClint.dart';
-
 // ১. Repository Provider
 final letterOfCreditRepositoryProvider = Provider<LetterOfCreditRepository>((ref) {
   return LetterOfCreditRepository(ref.watch(apiClientProvider));

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
+import 'package:scm_flutter/cutomer/screen/customer_register_screen.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiClint.dart';
 import 'package:scm_flutter/widget/commonWidget.dart';
@@ -202,8 +203,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 style: TextStyle(color: AppTheme.secondary, fontSize: 13),
                               ),
                               TextButton(
-                                onPressed: () => Navigator.of(context)
-                                    .pushNamed('/register'),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => const CustomerRegisterScreen(),
+                                    ),
+                                  );
+                                },
                                 child: const Text(
                                   'Register',
                                   style: TextStyle(fontWeight: FontWeight.bold),

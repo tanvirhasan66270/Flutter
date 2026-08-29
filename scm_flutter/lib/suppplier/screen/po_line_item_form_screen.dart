@@ -214,23 +214,23 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+          colors: [AppTheme.indigo, AppTheme.indigoDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.note_add_outlined, color: Colors.white, size: 28),
+          const Icon(Icons.note_add_outlined, color: AppTheme.white, size: 28),
           const SizedBox(width: 12),
           const Expanded(
             child: Text(
               'Append Order Line Distribution',
-              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppTheme.white, fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white70, size: 24),
+            icon: Icon(Icons.close, color: AppTheme.white.withValues(alpha: 0.7), size: 24),
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -246,18 +246,18 @@ class _POLineItemFormScreenState extends ConsumerState<POLineItemFormScreen> {
           Container(
             width: 18,
             height: 18,
-            decoration: const BoxDecoration(color: Color(0xFFE0E7FF), shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: AppTheme.blueLight, shape: BoxShape.circle),
             child: Center(
               child: Text(
                 stepNum.toString(),
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.indigoDark),
               ),
             ),
           ),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF475569), letterSpacing: 0.5),
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
           ),
         ],
       ),

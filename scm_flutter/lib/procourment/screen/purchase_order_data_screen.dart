@@ -10,7 +10,9 @@ import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 class PurchaseOrderDataScreen extends ConsumerStatefulWidget {
-  const PurchaseOrderDataScreen({super.key});
+  final String? initialStatus;
+
+  const PurchaseOrderDataScreen({super.key, this.initialStatus});
 
   @override
   ConsumerState<PurchaseOrderDataScreen> createState() => _PurchaseOrderDataScreenState();
@@ -19,7 +21,13 @@ class PurchaseOrderDataScreen extends ConsumerStatefulWidget {
 class _PurchaseOrderDataScreenState extends ConsumerState<PurchaseOrderDataScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String _selectedStatusFilter = 'ALL';
+  late String _selectedStatusFilter;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedStatusFilter = widget.initialStatus ?? 'ALL';
+  }
 
   @override
   void dispose() {

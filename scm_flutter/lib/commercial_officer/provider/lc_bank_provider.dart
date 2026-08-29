@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
 import 'package:scm_flutter/commercial_officer/data/lc_bank_repository.dart';
 import 'package:scm_flutter/entity/lc_bank.dart';
-import 'package:scm_flutter/util/apiClint.dart';
 
 // ১. Repository Provider
 final lcBankRepositoryProvider = Provider<LCBankRepository>((ref) {
