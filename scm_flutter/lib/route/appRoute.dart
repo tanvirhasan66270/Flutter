@@ -59,6 +59,7 @@ import 'package:scm_flutter/suppplier/screen/supplier_form_screen.dart';
 import 'package:scm_flutter/system/massage/chat_workspace_screen.dart';
 import 'package:scm_flutter/system/notification/notification_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_dashboard_screen.dart';
+import 'package:scm_flutter/sales_officer/screen/sales_officer_profile_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_pdf_screen.dart';
 import 'package:scm_flutter/logistics_officer/screen/logistics_officer_dashboard_screen.dart';
@@ -139,6 +140,11 @@ class AppRouter {
           settings: settings,
         );
 
+      case '/sales-officer-profile':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: SalesOfficerProfileScreen()),
+          settings: settings,
+        );
       case '/customer-order-track':
         final orderNo = settings.arguments as String?;
         return MaterialPageRoute(
@@ -580,6 +586,10 @@ class RoleRedirectScreen extends ConsumerWidget {
           case 'LOGISTICS_OFFICER':
           case 'ROLE_LOGISTICS_OFFICER':
             return const LogisticsOfficerDashboardScreen();
+          case 'SALES_OFFICER':
+          case 'ROLE_SALES_OFFICER':
+            // For now, redirect to profile or a dashboard if it exists
+            return const SalesOfficerProfileScreen();
           default:
             return const LoginScreen();
         }

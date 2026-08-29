@@ -74,7 +74,10 @@ class ApiConstants {
   static String qcInspectorById(int id) => 'qc-inspectors/$id';
   static String qcInspectorByUserId(int userId) => 'qc-inspectors/user/$userId';
 
-
+  // ── Sales Officer Endpoints ──────────────────────────────
+  static const String salesOfficers = 'sales-officers';
+  static String salesOfficerById(int id) => 'sales-officers/$id';
+  static String salesOfficerByUserId(int userId) => 'sales-officers/user/$userId';
 
 
   // ── Address hierarchy ────────────────────────────────────
