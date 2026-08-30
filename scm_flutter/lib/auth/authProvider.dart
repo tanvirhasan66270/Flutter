@@ -26,6 +26,11 @@ class AuthController extends StateNotifier<AsyncValue<LoginResponse?>>{
   Future<void> _restoreSession() async {
     final storage = _ref.read(storageServiceProvider);
     final user = await storage.getUser();
+    final token = await storage.getToken();
+    if (token == null || token.trim().isEmpty || user == null) {
+      state = const AsyncValue.data(null);
+      return;
+    }
     state = AsyncValue.data(user);
   }
 

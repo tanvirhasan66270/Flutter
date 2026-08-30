@@ -13,10 +13,11 @@ class GoodReceivedNoteRepository {
   Future<List<GoodsReceivedNoteResponseModel>> findAll() async {
     try {
       final response = await _dio.get(ApiConstants.goodsReceivedNotes);
-      final List data = response.data ?? [];
+      if (response.statusCode == 204 || response.data == null) return [];
+      final List data = response.data as List;
       return data.map((e) => GoodsReceivedNoteResponseModel.fromJson(e)).toList();
-    } catch (e) {
-      throw Exception('Failed to load goods received notes: $e');
+    } catch (_) {
+      return [];
     }
   }
 

@@ -15,10 +15,11 @@ class QCInspectionRepository {
   Future<List<QCInspectionResponseModel>> findAll() async {
     try {
       final response = await _dio.get(ApiConstants.qcInspections);
-      final List data = response.data ?? [];
+      if (response.statusCode == 204 || response.data == null) return [];
+      final List data = response.data as List;
       return data.map((e) => QCInspectionResponseModel.fromJson(e)).toList();
-    } catch (e) {
-      throw Exception('Failed to load QC inspections: $e');
+    } catch (_) {
+      return [];
     }
   }
 

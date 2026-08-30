@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/entity/qc_inspaction_model.dart';
 import 'package:scm_flutter/logistics_officer/provider/good_received_note_provider.dart';
-import 'package:scm_flutter/logistics_officer/screen/good_received_note_form_screen.dart';
+import 'package:scm_flutter/logistics_officer/screen/good_received_note_data_screen.dart';
 import 'package:scm_flutter/qc_inspactor/provider/qc_inspection_provider.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_form_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
@@ -285,13 +285,13 @@ class _QCDashboardScreenState extends ConsumerState<QCDashboardScreen> {
                             child: InkWell(
                               onTap: () => Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const GoodReceivedNoteFormScreen()),
+                                MaterialPageRoute(builder: (_) => const GoodReceivedNoteDataScreen()),
                               ),
                               borderRadius: BorderRadius.circular(12),
                               child: _buildActionCard(
                                 icon: Icons.download_rounded,
                                 title: 'Goods Received Note',
-                                subtitle: 'Manage inbound inventory GRN',
+                                subtitle: 'View & inspect inbound GRN registry',
                               ),
                             ),
                           ),
@@ -338,7 +338,7 @@ class _QCDashboardScreenState extends ConsumerState<QCDashboardScreen> {
           if (idx == 1) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const QCInspectionDataScreen()));
           } else if (idx == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const GoodReceivedNoteFormScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const GoodReceivedNoteDataScreen()));
           }
         },
         items: const [

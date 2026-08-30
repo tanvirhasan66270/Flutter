@@ -6,6 +6,7 @@ import 'package:scm_flutter/entity/grn_model.dart';
 import 'package:scm_flutter/entity/productModel.dart';
 import 'package:scm_flutter/logistics_officer/provider/good_received_note_provider.dart';
 import 'package:scm_flutter/logistics_officer/provider/warehouse_provider.dart';
+import 'package:scm_flutter/logistics_officer/screen/good_received_note_data_screen.dart';
 import 'package:scm_flutter/procourment/provider/purchase_order_provider.dart';
 import 'package:scm_flutter/procourment/provider/purchase_requisition_provider.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
@@ -90,6 +91,60 @@ class _GoodReceivedNoteFormScreenState extends ConsumerState<GoodReceivedNoteFor
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = ref.watch(currentUserProvider);
+    final userRole = currentUser?.role.toUpperCase() ?? '';
+    final isQcInspector = userRole == 'QC_INSPECTOR' || userRole == 'ROLE_QC_INSPECTOR' || userRole == 'QC' || userRole == 'QC_INSPACTOR' || userRole == 'ROLE_QC_INSPACTOR';
+
+    if (isQcInspector) {
+      return Scaffold(
+        backgroundColor: AppTheme.light,
+        appBar: AppBar(
+          title: const Text('Access Restricted', style: TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 16)),
+          backgroundColor: AppTheme.surfaceWhite,
+          elevation: 0,
+          leading: const BackButton(color: AppTheme.dark),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.block_outlined, color: AppTheme.danger, size: 64),
+                const SizedBox(height: 16),
+                const Text(
+                  'Form Access Restricted',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.dark),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'QC Inspectors are authorized for read-only view of Goods Received Notes (GRN). Form creation and modification are restricted.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppTheme.secondary, fontSize: 13),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: AppTheme.surfaceWhite,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const GoodReceivedNoteDataScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.table_chart_outlined, size: 18),
+                  label: const Text('View GRN Registry Data'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final isEdit = widget.grnToEdit != null;
     final purchaseOrdersAsync = ref.watch(purchaseOrderListProvider);
     final purchaseRequisitionsAsync = ref.watch(purchaseRequisitionListProvider);

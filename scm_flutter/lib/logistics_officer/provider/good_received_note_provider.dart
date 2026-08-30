@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
 import 'package:scm_flutter/entity/grn_model.dart';
 import 'package:scm_flutter/logistics_officer/data/good_received_note_repository.dart';
@@ -11,8 +12,14 @@ final goodReceivedNoteRepositoryProvider = Provider<GoodReceivedNoteRepository>(
 
 // ২. List Provider
 final goodReceivedNoteListProvider = FutureProvider.autoDispose<List<GoodsReceivedNoteResponseModel>>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return [];
   final repo = ref.watch(goodReceivedNoteRepositoryProvider);
-  return await repo.findAll();
+  try {
+    return await repo.findAll();
+  } catch (_) {
+    return [];
+  }
 });
 
 // ৩. Controller / Notifier (Save, Update, Delete)

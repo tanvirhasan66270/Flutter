@@ -68,7 +68,7 @@ class _GoodReceivedNoteDataScreenState extends ConsumerState<GoodReceivedNoteDat
     final currentInspectorAsync = ref.watch(currentQcInspectorProvider);
 
     final userRole = currentUser?.role.toUpperCase() ?? '';
-    final isQcInspector = userRole == 'QC_INSPECTOR' || userRole == 'ROLE_QC_INSPECTOR';
+    final isQcInspector = userRole == 'QC_INSPECTOR' || userRole == 'ROLE_QC_INSPECTOR' || userRole == 'QC' || userRole == 'QC_INSPACTOR' || userRole == 'ROLE_QC_INSPACTOR';
     final currentInspector = currentInspectorAsync.value;
 
     final canConsoleActions = userRole == 'ADMIN' || userRole == 'LOGISTICS_OFFICER' || userRole == 'ROLE_ADMIN' || userRole == 'ROLE_LOGISTICS_OFFICER';
@@ -135,14 +135,20 @@ class _GoodReceivedNoteDataScreenState extends ConsumerState<GoodReceivedNoteDat
             if (isQcInspector) {
               final cId = currentInspector?.id;
               final cUserId = currentUser?.userId;
-              final cName = currentInspector?.name ?? currentUser?.name ?? '';
+              final cName = (currentInspector?.name ?? currentUser?.name ?? '').trim().toLowerCase();
 
-              grns = allGrns.where((g) {
+              final assignedGrns = allGrns.where((g) {
                 final matchesId = cId != null && g.inspectedBy == cId;
                 final matchesUserId = cUserId != null && g.inspectedBy == cUserId;
-                final matchesName = cName.isNotEmpty && (g.inspectedByName?.toLowerCase().trim() == cName.toLowerCase().trim());
+                final matchesName = cName.isNotEmpty && (g.inspectedByName?.toLowerCase().trim() == cName);
                 return matchesId || matchesUserId || matchesName;
               }).toList();
+
+              if (assignedGrns.isNotEmpty) {
+                grns = assignedGrns;
+              } else {
+                grns = allGrns;
+              }
             }
 
             final filteredList = grns.where((g) {

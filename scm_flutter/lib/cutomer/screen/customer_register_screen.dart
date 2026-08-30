@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,6 +32,8 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
   String _gender = 'MALE';
   int? _policeStationId;
   File? _selectedImage;
+  Uint8List? _selectedImageBytes;
+  String? _selectedImageName;
   final ImagePicker _picker = ImagePicker();
 
   bool _isSubmitting = false;
@@ -55,8 +58,13 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
     try {
       final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
       if (picked != null) {
+        final bytes = await picked.readAsBytes();
         setState(() {
-          _selectedImage = File(picked.path);
+          _selectedImageBytes = bytes;
+          _selectedImageName = picked.name;
+          if (!kIsWeb) {
+            _selectedImage = File(picked.path);
+          }
         });
       }
     } catch (e) {
@@ -125,7 +133,12 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
       );
 
       final repo = ref.read(customerRepositoryProvider);
-      final response = await repo.create(request, _selectedImage);
+      final response = await repo.create(
+        request,
+        _selectedImage,
+        imageBytes: _selectedImageBytes,
+        imageName: _selectedImageName,
+      );
 
       ref.invalidate(customerListProvider);
 
@@ -375,8 +388,10 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
                                       CircleAvatar(
                                         radius: 40,
                                         backgroundColor: AppTheme.blueLight,
-                                        backgroundImage: _selectedImage != null ? FileImage(_selectedImage!) : null,
-                                        child: _selectedImage == null
+                                        backgroundImage: _selectedImageBytes != null
+                                            ? MemoryImage(_selectedImageBytes!)
+                                            : (_selectedImage != null ? FileImage(_selectedImage!) as ImageProvider : null),
+                                        child: (_selectedImageBytes == null && _selectedImage == null)
                                             ? const Icon(Icons.person, size: 45, color: AppTheme.primary)
                                             : null,
                                       ),
@@ -394,7 +409,9 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  _selectedImage == null ? 'Tap to upload profile photo (Optional)' : 'Photo attached',
+                                  (_selectedImageBytes == null && _selectedImage == null)
+                                      ? 'Tap to upload profile photo (Optional)'
+                                      : 'Photo attached (${_selectedImageName ?? 'profile.jpg'})',
                                   style: const TextStyle(fontSize: 10, color: AppTheme.grey, fontWeight: FontWeight.bold),
                                 ),
                               ],

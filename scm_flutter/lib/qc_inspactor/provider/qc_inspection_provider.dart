@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/auth/helperProvider.dart';
 import 'package:scm_flutter/entity/qc_inspaction_model.dart';
 import 'package:scm_flutter/qc_inspactor/data/qc_inspection_repository.dart';
@@ -12,8 +13,14 @@ final qcInspectionRepositoryProvider = Provider<QCInspectionRepository>((ref) {
 
 // ২. List Provider
 final qcInspectionListProvider = FutureProvider.autoDispose<List<QCInspectionResponseModel>>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return [];
   final repo = ref.watch(qcInspectionRepositoryProvider);
-  return await repo.findAll();
+  try {
+    return await repo.findAll();
+  } catch (_) {
+    return [];
+  }
 });
 
 // ৩. Controller / Notifier (Save, Update, Delete )
