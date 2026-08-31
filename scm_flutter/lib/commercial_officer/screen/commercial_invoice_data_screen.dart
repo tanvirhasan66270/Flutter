@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/commercial_officer/provider/invoice_provider.dart';
 import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_form_screen.dart';
 import 'package:scm_flutter/commercial_officer/screen/commercial_invoice_pdf_screen.dart';
+import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
+import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 
 class CommercialInvoiceDataScreen extends ConsumerStatefulWidget {
@@ -55,30 +57,19 @@ class _CommercialInvoiceDataScreenState extends ConsumerState<CommercialInvoiceD
   @override
   Widget build(BuildContext context) {
     final invoiceListAsync = ref.watch(invoiceListProvider);
+    final currentUser = ref.watch(currentUserProvider);
+    final currentCustomerAsync = ref.watch(currentCustomerProvider);
+
+    final userRole = currentUser?.role.toUpperCase() ?? '';
+    final isCustomer = userRole == 'CUSTOMER';
+    final customerEmail = currentUser?.email.toLowerCase().trim() ?? '';
+    final customerName = (currentCustomerAsync.value?.name ?? currentUser?.name ?? '').toLowerCase().trim();
 
     return Scaffold(
       backgroundColor: AppTheme.light,
-      appBar: AppBar(
-        title: const Text(
-          'Commercial Invoice Ledger',
-          style: TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 17),
-        ),
-        backgroundColor: AppTheme.white,
-        elevation: 0,
-        leading: const BackButton(color: AppTheme.dark),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, color: AppTheme.primary),
-            tooltip: 'Generate Invoice Node',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CommercialInvoiceFormScreen()),
-              );
-            },
-          ),
-          const DynamicNotificationButton(),
-        ],
+      appBar: DynamicScmTopNavBar(
+        showBackButton: true,
+        title: isCustomer ? 'My Invoices & Payments' : 'Commercial Invoice Ledger',
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -95,7 +86,17 @@ class _CommercialInvoiceDataScreenState extends ConsumerState<CommercialInvoiceD
               ),
             ),
           ),
-          data: (invoices) {
+          data: (allInvoices) {
+            List<dynamic> invoicesList = allInvoices;
+            if (isCustomer) {
+              invoicesList = allInvoices.where((inv) {
+                final matchesEmail = customerEmail.isNotEmpty && inv.customerEmail.toLowerCase().trim() == customerEmail;
+                final matchesName = customerName.isNotEmpty && inv.issuedToName.toLowerCase().trim() == customerName;
+                return matchesEmail || matchesName;
+              }).toList();
+            }
+
+            final invoices = invoicesList.cast<dynamic>();
             final totalCount = invoices.length;
             final totalBilling = invoices.fold<double>(0, (sum, inv) => sum + inv.totalAmount);
             final paidBilling = invoices.fold<double>(0, (sum, inv) => sum + inv.paidAmount);
@@ -153,22 +154,23 @@ class _CommercialInvoiceDataScreenState extends ConsumerState<CommercialInvoiceD
                                 ),
                               ],
                             ),
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.primary,
-                                foregroundColor: AppTheme.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            if (!isCustomer)
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primary,
+                                  foregroundColor: AppTheme.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                icon: const Icon(Icons.add, size: 14),
+                                label: const Text('New Invoice', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const CommercialInvoiceFormScreen()),
+                                  );
+                                },
                               ),
-                              icon: const Icon(Icons.add, size: 14),
-                              label: const Text('New Invoice', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const CommercialInvoiceFormScreen()),
-                                );
-                              },
-                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -421,43 +423,44 @@ class _CommercialInvoiceDataScreenState extends ConsumerState<CommercialInvoiceD
                                         );
                                       },
                                     ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.edit_outlined, color: AppTheme.warning, size: 20),
-                                          tooltip: 'Edit Parameters',
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => CommercialInvoiceFormScreen(invoiceToEdit: inv),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 20),
-                                          tooltip: 'Purge Record',
-                                          onPressed: () async {
-                                            final confirm = await showDialog<bool>(
-                                              context: context,
-                                              builder: (ctx) => AlertDialog(
-                                                title: const Text('Confirm Deletion'),
-                                                content: Text('Are you sure you want to drop invoice ${inv.invoiceNumber}?'),
-                                                actions: [
-                                                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                                                  TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete', style: TextStyle(color: AppTheme.danger))),
-                                                ],
-                                              ),
-                                            );
-                                            if (confirm == true) {
-                                              await ref.read(invoiceControllerProvider.notifier).deleteInvoice(inv.id);
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
+                                    if (!isCustomer)
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.edit_outlined, color: AppTheme.warning, size: 20),
+                                            tooltip: 'Edit Parameters',
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => CommercialInvoiceFormScreen(invoiceToEdit: inv),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 20),
+                                            tooltip: 'Purge Record',
+                                            onPressed: () async {
+                                              final confirm = await showDialog<bool>(
+                                                context: context,
+                                                builder: (ctx) => AlertDialog(
+                                                  title: const Text('Confirm Deletion'),
+                                                  content: Text('Are you sure you want to drop invoice ${inv.invoiceNumber}?'),
+                                                  actions: [
+                                                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                                                    TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete', style: TextStyle(color: AppTheme.danger))),
+                                                  ],
+                                                ),
+                                              );
+                                              if (confirm == true) {
+                                                await ref.read(invoiceControllerProvider.notifier).deleteInvoice(inv.id);
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                   ],
                                 ),
                               ],

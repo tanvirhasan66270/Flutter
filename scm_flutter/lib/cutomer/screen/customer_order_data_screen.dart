@@ -4,9 +4,9 @@ import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/cutomer/provider/customer_provider.dart' hide customerOrderRepositoryProvider;
 import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/cutomer/screen/customer_order_pdf_screen.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
+import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 class CustomerOrderDataScreen extends ConsumerStatefulWidget {
   const CustomerOrderDataScreen({super.key});
@@ -145,22 +145,20 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
   Widget build(BuildContext context) {
     final myOrdersAsync = ref.watch(myCustomerOrdersProvider);
     final currentUser = ref.watch(currentUserProvider);
+    final currentCustomerAsync = ref.watch(currentCustomerProvider);
+
     final userRole = currentUser?.role.toUpperCase() ?? '';
+    final isCustomerRole = userRole == 'CUSTOMER';
+    final customerId = currentCustomerAsync.value?.id;
+    final userEmail = currentUser?.email.toLowerCase().trim() ?? '';
+    final userPhone = currentUser?.phone.trim() ?? '';
     final canUpdateStatus = ['SALES_OFFICER', 'ROLE_SALES_OFFICER', 'SALES', 'MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].contains(userRole);
 
     return Scaffold(
       backgroundColor: AppTheme.light,
-      appBar: AppBar(
-        title: const Text(
-          'Customer Orders Directory',
-          style: TextStyle(color: AppTheme.dark, fontWeight: FontWeight.bold, fontSize: 17),
-        ),
-        backgroundColor: AppTheme.white,
-        elevation: 0,
-        leading: const BackButton(color: AppTheme.dark),
-        actions: const [
-          DynamicNotificationButton(),
-        ],
+      appBar: DynamicScmTopNavBar(
+        showBackButton: true,
+        title: isCustomerRole ? 'My Orders History' : 'Customer Orders Directory',
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -190,7 +188,19 @@ class _CustomerOrderDataScreenState extends ConsumerState<CustomerOrderDataScree
               ),
             ),
           ),
-          data: (orders) {
+          data: (allOrders) {
+            List<CustomerOrderResponse> orders = allOrders;
+
+            if (isCustomerRole) {
+              final myOrders = allOrders.where((order) {
+                final matchesId = customerId != null && order.customerId == customerId;
+                final matchesEmail = userEmail.isNotEmpty && order.customerEmail.toLowerCase().trim() == userEmail;
+                final matchesPhone = userPhone.isNotEmpty && order.deliveryPhone.trim() == userPhone;
+                return matchesId || matchesEmail || matchesPhone;
+              }).toList();
+              orders = myOrders;
+            }
+
             // Apply filtering & searching
             final filteredOrders = orders.where((order) {
               final matchesSearch = _searchQuery.isEmpty ||

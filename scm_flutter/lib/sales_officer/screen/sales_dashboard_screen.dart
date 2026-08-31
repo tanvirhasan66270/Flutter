@@ -5,6 +5,7 @@ import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/commercial_officer/provider/invoice_provider.dart';
 import 'package:scm_flutter/cutomer/provider/customer_provider.dart' hide customerOrderRepositoryProvider;
 import 'package:scm_flutter/cutomer/provider/customeroredr_provider.dart';
+import 'package:scm_flutter/cutomer/screen/customer_register_screen.dart';
 import 'package:scm_flutter/entity/customerModel.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/entity/invoiceModel.dart';
@@ -35,7 +36,7 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
   // Search & Filter state for Customer Order Log Table
   final TextEditingController _orderSearchController = TextEditingController();
   String _orderSearchText = '';
-  String _orderSearchDate = '';
+  final String _orderSearchDate = '';
 
   // Overview Filters
   int _selectedOverviewMonth = DateTime.now().month - 1;
@@ -190,7 +191,6 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
     return Scaffold(
       backgroundColor: AppTheme.light,
       appBar: DynamicScmTopNavBar(
-        title: 'Sales Officer Console',
         onRefresh: () {
           ref.invalidate(customerOrderListProvider);
           ref.invalidate(quotationListProvider);
@@ -422,7 +422,7 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
             children: [
               _quickActionTile(context, 'Issue Quotation', 'Approved quotes...', Icons.add, AppTheme.success, AppTheme.successLight, () => Navigator.pushNamed(context, '/quotations', arguments: 'APPROVED')),
               _quickActionTile(context, 'View Purchase', 'Received POs...', Icons.shopping_cart_outlined, AppTheme.primary, AppTheme.blueLight, () => Navigator.pushNamed(context, '/purchase-orders', arguments: 'RECEIVED')),
-              _quickActionTile(context, 'Add Customer', 'Register new...', Icons.person_add_outlined, AppTheme.info, AppTheme.infoLight, () => _openCustomerDirectoryModal(context, customers)),
+              _quickActionTile(context, 'Add Customer', 'Register new...', Icons.person_add_outlined, AppTheme.info, AppTheme.infoLight, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomerRegisterScreen()))),
               _quickActionTile(context, 'Sales Invoicing', 'Record payment...', Icons.receipt_long_outlined, AppTheme.warning, AppTheme.warningLight, () => Navigator.pushNamed(context, '/add-payment')),
               _quickActionTile(context, 'Customer Orders', 'View & audit...', Icons.inventory_2_outlined, AppTheme.danger, AppTheme.dangerLight, () => Navigator.pushNamed(context, '/customer-orders')),
               _quickActionTile(context, 'Commercial Invoice', 'Audit billing...', Icons.description, AppTheme.primary, AppTheme.blueLight, () => Navigator.pushNamed(context, '/commercial-invoice-data')),
@@ -674,8 +674,8 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
                     const SizedBox(height: 16),
                     // Visual Graph Container
                     Container(
-                      height: 120,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      height: 130,
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                       decoration: const BoxDecoration(
                         border: Border(bottom: BorderSide(color: AppTheme.borderGrey), left: BorderSide(color: AppTheme.borderGrey)),
                       ),
@@ -690,14 +690,14 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
                             children: [
                               Container(
                                 width: 14,
-                                height: 90 * heightFactor,
+                                height: 80 * heightFactor,
                                 decoration: BoxDecoration(
                                   color: i % 2 == 0 ? AppTheme.primary : AppTheme.success,
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              Text(monthlyLabels[i], style: const TextStyle(fontSize: 7, color: AppTheme.grey)),
+                              Text(monthlyLabels[i], style: const TextStyle(fontSize: 8, color: AppTheme.grey)),
                             ],
                           );
                         }),
@@ -1294,7 +1294,7 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
             Expanded(
               child: ListView.separated(
                 itemCount: quotations.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (ctx, idx) => const Divider(height: 1),
                 itemBuilder: (context, i) {
                   final q = quotations[i];
                   return ListTile(
@@ -1338,7 +1338,7 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
             Expanded(
               child: ListView.separated(
                 itemCount: customers.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (ctx, idx) => const Divider(height: 1),
                 itemBuilder: (context, i) {
                   final c = customers[i];
                   return ListTile(
@@ -1381,7 +1381,7 @@ class _SalesDashboardScreenState extends ConsumerState<SalesDashboardScreen> {
             Expanded(
               child: ListView.separated(
                 itemCount: shipments.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (ctx, idx) => const Divider(height: 1),
                 itemBuilder: (context, i) {
                   final s = shipments[i];
                   return ListTile(

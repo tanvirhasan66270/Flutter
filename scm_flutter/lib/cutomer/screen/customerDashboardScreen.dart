@@ -4,11 +4,11 @@ import 'package:scm_flutter/auth/authProvider.dart';
 import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
 import 'package:scm_flutter/entity/customerOrderModel.dart';
 import 'package:scm_flutter/product/provider/product_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/system/notification/notification_provider.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
 import 'package:scm_flutter/util/pdf_invoice_generator.dart';
+import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 class CustomerDashboardScreen extends ConsumerStatefulWidget {
   const CustomerDashboardScreen({super.key});
@@ -44,24 +44,6 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
     return '${ApiConstants.imgUrl}product/$trimmed';
   }
 
-  String _resolveProfileImageUrl(String? imgPath) {
-    if (imgPath == null || imgPath.trim().isEmpty) return '';
-    final trimmed = imgPath.trim();
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return trimmed;
-    }
-    if (trimmed.startsWith('/images/')) {
-      return '${ApiConstants.imgUrl}${trimmed.substring(8)}';
-    }
-    if (trimmed.startsWith('images/')) {
-      return '${ApiConstants.imgUrl}${trimmed.substring(7)}';
-    }
-    if (trimmed.startsWith('customer/') || trimmed.startsWith('user/')) {
-      return '${ApiConstants.imgUrl}$trimmed';
-    }
-    return '${ApiConstants.imgUrl}customer/$trimmed';
-  }
-
   Color _getStatusColor(String status) {
     return AppTheme.statusColor(status);
   }
@@ -79,7 +61,6 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
         : (currentCustomerAsync.value?.name.isNotEmpty == true
             ? currentCustomerAsync.value!.name
             : 'Customer');
-    final String userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'C';
 
     // Calculate dynamic due total & wallet paid total
     double dueAmountTotal = 0.0;
@@ -94,76 +75,7 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
 
     return Scaffold(
       backgroundColor: AppTheme.light,
-      appBar: AppBar(
-        backgroundColor: AppTheme.white,
-        elevation: 0,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.inventory_2_rounded, color: AppTheme.primary, size: 22),
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'SCM ENTERPRISE',
-              style: TextStyle(color: AppTheme.dark, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          const DynamicNotificationButton(),
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pushNamed('/profile'),
-              child: Builder(
-                builder: (context) {
-                  final String? rawImage = currentCustomerAsync.value?.image;
-                  final String profileUrl = _resolveProfileImageUrl(rawImage);
-
-                  return CircleAvatar(
-                    backgroundColor: AppTheme.primary,
-                    backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
-                    child: profileUrl.isEmpty
-                        ? Text(userInitial, style: const TextStyle(color: AppTheme.white, fontWeight: FontWeight.bold))
-                        : null,
-                  );
-                },
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: AppTheme.danger),
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Logout'),
-                  content: const Text('Are you sure you want to log out?'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Logout', style: TextStyle(color: AppTheme.danger)),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm == true) {
-                await ref.read(authControllerProvider.notifier).logout();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-                }
-              }
-            },
-          ),
-        ],
-      ),
+      appBar: const DynamicScmTopNavBar(),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(customerOrderSummaryProvider);
@@ -677,11 +589,11 @@ class _CustomerDashboardScreenState extends ConsumerState<CustomerDashboardScree
         onTap: (index) {
           setState(() => _currentIndex = index);
           if (index == 1) {
-            Navigator.of(context).pushNamed('/customer-order-track');
+            Navigator.of(context).pushNamed('/customer-orders');
           } else if (index == 2) {
             Navigator.of(context).pushNamed('/products');
           } else if (index == 3) {
-            Navigator.of(context).pushNamed('/billing-ledger');
+            Navigator.of(context).pushNamed('/commercial-invoice-data');
           } else if (index == 4) {
             Navigator.of(context).pushNamed('/profile');
           }

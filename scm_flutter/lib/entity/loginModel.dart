@@ -25,6 +25,7 @@ class LoginResponse {
   final String role;
   final int? hubId;
   final String? hubName;
+  final String? image;
 
   LoginResponse({
     required this.token,
@@ -36,6 +37,7 @@ class LoginResponse {
     required this.role,
     this.hubId,
     this.hubName,
+    this.image,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class LoginResponse {
       role: json['role'] ?? '',
       hubId: json['hubId'],
       hubName: json['hubName'],
+      image: json['image'] ?? json['photo'] ?? json['profileImage'] ?? json['avatar'] ?? json['userImage'],
     );
   }
 
@@ -63,6 +66,7 @@ class LoginResponse {
       'role': role,
       'hubId': hubId,
       'hubName': hubName,
+      'image': image,
     };
   }
 }

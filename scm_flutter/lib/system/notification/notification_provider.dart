@@ -15,7 +15,19 @@ final notificationListProvider = FutureProvider.autoDispose<List<dynamic>>((ref)
   if (user == null) return [];
   final repository = ref.watch(notificationRepositoryProvider);
   try {
-    return await repository.getUserNotifications();
+    final list = await repository.getUserNotifications();
+    final userIdStr = user.userId.toString();
+    final userEmail = user.email.toLowerCase().trim();
+    
+    final userNotifications = list.where((item) {
+      if (item is! Map) return true;
+      final m = Map<String, dynamic>.from(item);
+      final recipientId = (m['recipientId'] ?? m['userId'] ?? m['recipient'] ?? m['user_id'])?.toString().trim() ?? '';
+      if (recipientId.isEmpty) return true;
+      return recipientId == userIdStr || recipientId.toLowerCase() == userEmail;
+    }).toList();
+
+    return userNotifications;
   } catch (_) {
     return [];
   }
@@ -25,9 +37,15 @@ final notificationListProvider = FutureProvider.autoDispose<List<dynamic>>((ref)
 final notificationUnreadCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final user = ref.watch(currentUserProvider);
   if (user == null) return 0;
-  final repository = ref.watch(notificationRepositoryProvider);
   try {
-    return await repository.getUnreadCount();
+    final list = await ref.watch(notificationListProvider.future);
+    final unreadCount = list.where((item) {
+      if (item is! Map) return false;
+      final m = Map<String, dynamic>.from(item);
+      final isRead = m['isRead'] ?? m['read'] ?? false;
+      return !isRead;
+    }).length;
+    return unreadCount;
   } catch (_) {
     return 0;
   }

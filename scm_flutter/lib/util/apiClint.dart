@@ -28,7 +28,7 @@ ApiClient(this._storageService) {
         handler.next(options);
       },
       onError: (error, handler) async {
-        if (error.response?.statusCode == 401 || error.response?.statusCode == 403) {
+        if (error.response?.statusCode == 401) {
           final isPublicRoute = error.requestOptions.path.contains('/api/country') ||
               error.requestOptions.path.contains('/api/division') ||
               error.requestOptions.path.contains('/api/district') ||

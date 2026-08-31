@@ -237,15 +237,16 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildLabel('CATEGORY', Icons.category_outlined, primaryGreen),
+                                 _buildLabel('CATEGORY', Icons.category_outlined, primaryGreen),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
+                                  isExpanded: true,
                                   initialValue: categoryId,
                                   decoration: _inputDecoration(primaryGreen),
-                                  hint: const Text('Select Category', style: TextStyle(fontSize: 12)),
+                                  hint: const Text('Select Category', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                                   items: categories.map((c) => DropdownMenuItem<int>(
                                     value: c.id,
-                                    child: Text(c.categoryName, style: const TextStyle(fontSize: 12)),
+                                    child: Text(c.categoryName, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                                   )).toList(),
                                   onChanged: (val) => setState(() => categoryId = val),
                                 ),
@@ -320,12 +321,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                                 _buildLabel('UNIT TYPE', Icons.layers_outlined, primaryGreen),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<String>(
+                                  isExpanded: true,
                                   initialValue: unitType,
                                   decoration: _inputDecoration(primaryGreen),
                                   items: const [
-                                    DropdownMenuItem(value: 'PCS', child: Text('PCS', style: TextStyle(fontSize: 12))),
-                                    DropdownMenuItem(value: 'KG', child: Text('KG', style: TextStyle(fontSize: 12))),
-                                    DropdownMenuItem(value: 'BOX', child: Text('BOX', style: TextStyle(fontSize: 12))),
+                                    DropdownMenuItem(value: 'PCS', child: Text('PCS', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
+                                    DropdownMenuItem(value: 'KG', child: Text('KG', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
+                                    DropdownMenuItem(value: 'BOX', child: Text('BOX', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
                                   ],
                                   onChanged: (val) => setState(() => unitType = val ?? 'PCS'),
                                 ),

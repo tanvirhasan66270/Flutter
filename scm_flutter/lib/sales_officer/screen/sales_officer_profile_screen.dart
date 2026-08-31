@@ -593,7 +593,7 @@ class _SalesOfficerProfileScreenState extends ConsumerState<SalesOfficerProfileS
       title: const Text('Gender Node', style: TextStyle(fontSize: 10, color: AppTheme.grey, fontWeight: FontWeight.bold)),
       subtitle: _isEditing
           ? DropdownButtonFormField<String>(
-              value: ['MALE', 'FEMALE', 'OTHER'].contains(_genderController.text.toUpperCase())
+              initialValue: ['MALE', 'FEMALE', 'OTHER'].contains(_genderController.text.toUpperCase())
                   ? _genderController.text.toUpperCase()
                   : 'MALE',
               decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6)),

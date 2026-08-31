@@ -7,9 +7,9 @@ import 'package:scm_flutter/logistics_officer/screen/good_received_note_data_scr
 import 'package:scm_flutter/qc_inspactor/provider/qc_inspection_provider.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_form_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/system/notification/notification_provider.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
+import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 class QCDashboardScreen extends ConsumerStatefulWidget {
   const QCDashboardScreen({super.key});
@@ -30,7 +30,7 @@ class _QCDashboardScreenState extends ConsumerState<QCDashboardScreen> {
     final userName = (currentUser?.name != null && currentUser!.name.isNotEmpty)
         ? currentUser.name
         : 'QC Inspector';
-    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : 'Q';
+
     final inspections = inspectionsAsync.value ?? [];
     final grns = grnsAsync.value ?? [];
 
@@ -54,68 +54,7 @@ class _QCDashboardScreenState extends ConsumerState<QCDashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.light,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceWhite,
-        elevation: 0,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppTheme.tealPrimary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.verified_user_rounded, color: AppTheme.tealPrimary, size: 22),
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'SCM QUALITY CONTROL',
-              style: TextStyle(color: AppTheme.dark, fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          // Dynamic Notification Button with Unread Badge
-          const DynamicNotificationButton(),
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: CircleAvatar(
-              backgroundColor: AppTheme.tealPrimary,
-              child: Text(
-                userInitial,
-                style: const TextStyle(color: AppTheme.surfaceWhite, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          IconButton(
-            tooltip: 'Logout',
-            icon: const Icon(Icons.logout, color: AppTheme.danger),
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Logout Confirmation'),
-                  content: const Text('Are you sure you want to log out from Quality Control Console?'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Logout', style: TextStyle(color: AppTheme.danger)),
-                    ),
-                  ],
-                ),
-              );
-
-              if (confirm == true) {
-                await ref.read(authControllerProvider.notifier).logout();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-                }
-              }
-            },
-          ),
-        ],
-      ),
+      appBar: const DynamicScmTopNavBar(),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(qcInspectionListProvider);

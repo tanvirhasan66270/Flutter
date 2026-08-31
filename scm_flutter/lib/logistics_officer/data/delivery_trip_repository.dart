@@ -56,8 +56,8 @@ class DeliveryTripRepository {
     try {
       FormData formData = FormData.fromMap({
         'status': status,
-        if (signature != null) 'signature': signature,
-        if (photo != null) 'photo': photo,
+        'signature': ?signature,
+        'photo': ?photo,
       });
 
       final response = await _dio.patch(

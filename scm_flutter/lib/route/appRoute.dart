@@ -64,6 +64,7 @@ import 'package:scm_flutter/sales_officer/screen/sales_dashboard_screen.dart';
 import 'package:scm_flutter/sales_officer/screen/sales_officer_profile_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_pdf_screen.dart';
+import 'package:scm_flutter/manager/screen/manager_dashboard_screen.dart';
 import 'package:scm_flutter/logistics_officer/screen/logistics_officer_dashboard_screen.dart';
 import 'package:scm_flutter/entity/inventory_model.dart';
 import 'package:scm_flutter/logistics_officer/screen/inventory_data_screen.dart';
@@ -154,6 +155,13 @@ class AppRouter {
           settings: settings,
         );
 
+      case '/manager-dashboard':
+      case '/manager':
+        return MaterialPageRoute(
+          builder: (_) => const _RequireAuth(child: ManagerDashboardScreen()),
+          settings: settings,
+        );
+
       case '/sales-dashboard':
       case '/sales-officer-dashboard':
       case '/sales':
@@ -228,6 +236,7 @@ class AppRouter {
         );
 
       case '/notifications':
+      case '/notification':
         return MaterialPageRoute(
           builder: (_) => const _RequireAuth(child: NotificationScreen()),
           settings: settings,
@@ -616,6 +625,9 @@ class RoleRedirectScreen extends ConsumerWidget {
             return const CustomerDashboardScreen();
           case 'ADMIN':
           case 'MANAGER':
+          case 'ROLE_MANAGER':
+          case 'ROLE_ADMIN':
+            return const ManagerDashboardScreen();
           case 'PROCUREMENT':
           case 'PROCUREMENT_OFFICER':
           case 'PURCHASING':

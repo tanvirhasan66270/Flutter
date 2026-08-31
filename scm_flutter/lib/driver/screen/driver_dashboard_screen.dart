@@ -123,7 +123,6 @@ class _DriverDashboardScreenState extends ConsumerState<DriverDashboardScreen> {
               children: [
                 // ── 1. Top Header (Procurement Styled Dynamic Navigation Bar)
                 DynamicScmTopNavBar(
-                  title: 'DRIVER DASHBOARD',
                   onRefresh: () {
                     ref.invalidate(deliveryTripListProvider);
                     ref.invalidate(vehicleListProvider);
@@ -1150,77 +1149,83 @@ class _DriverDashboardScreenState extends ConsumerState<DriverDashboardScreen> {
               ),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isAssigned) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.amber.shade200)),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'No vehicle currently assigned to your driver account in system.',
-                          style: TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: 340,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isAssigned) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.amber.shade200)),
+                      child: const Row(
                         children: [
-                          Text('Plate: ${vehicle.plateNumber}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: vehicle.status == 'AVAILABLE' ? Colors.green : Colors.orange,
-                              borderRadius: BorderRadius.circular(4),
+                          Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'No vehicle currently assigned to your driver account in system.',
+                              style: TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.bold),
                             ),
-                            child: Text(vehicle.status, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      Text('Type: ${vehicle.type}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                      Text('Capacity: ${vehicle.capacity} tons', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                      Text('Fuel Level: ${vehicle.fuelLevel}%', style: const TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text('Update Status:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
-                const SizedBox(height: 6),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedVehicleStatus,
-                  items: const [
-                    DropdownMenuItem(value: 'AVAILABLE', child: Text('AVAILABLE (Ready)')),
-                    DropdownMenuItem(value: 'ON_TRIP', child: Text('ON_TRIP (Dispatched)')),
-                    DropdownMenuItem(value: 'MAINTENANCE', child: Text('MAINTENANCE (Workshop)')),
-                    DropdownMenuItem(value: 'OUT_OF_SERVICE', child: Text('OUT_OF_SERVICE (Decommissioned)')),
+                    ),
+                  ] else ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Plate: ${vehicle.plateNumber}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: vehicle.status == 'AVAILABLE' ? Colors.green : Colors.orange,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(vehicle.status, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text('Type: ${vehicle.type}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                          Text('Capacity: ${vehicle.capacity} tons', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                          Text('Fuel Level: ${vehicle.fuelLevel}%', style: const TextStyle(fontSize: 11, color: Colors.orange, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Update Status:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      isExpanded: true,
+                      initialValue: _selectedVehicleStatus,
+                      items: const [
+                        DropdownMenuItem(value: 'AVAILABLE', child: Text('AVAILABLE (Ready)')),
+                        DropdownMenuItem(value: 'ON_TRIP', child: Text('ON_TRIP (Dispatched)')),
+                        DropdownMenuItem(value: 'MAINTENANCE', child: Text('MAINTENANCE (Workshop)')),
+                        DropdownMenuItem(value: 'OUT_OF_SERVICE', child: Text('OUT_OF_SERVICE (Decommissioned)')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setDialogState(() => _selectedVehicleStatus = val);
+                      },
+                      decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
+                    ),
                   ],
-                  onChanged: (val) {
-                    if (val != null) setDialogState(() => _selectedVehicleStatus = val);
-                  },
-                  decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                ),
-              ],
-            ],
+                ],
+              ),
+            ),
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),

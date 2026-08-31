@@ -112,12 +112,12 @@ class ChatContactModel {
 
   factory ChatContactModel.fromJson(Map<String, dynamic> json) {
     return ChatContactModel(
-      contactId: (json['contactId'] ?? json['userId'] ?? '').toString(),
-      contactName: (json['contactName'] ?? json['name'] ?? '') as String,
-      role: (json['role'] ?? '') as String,
-      lastMessage: json['lastMessage'] as String?,
-      lastMessageTime: json['lastMessageTime'] as String?,
-      unreadCount: (json['unreadCount'] ?? 0) as int,
+      contactId: (json['contactId'] ?? json['userId'] ?? json['id'] ?? '').toString(),
+      contactName: (json['contactName'] ?? json['name'] ?? json['driverName'] ?? '').toString(),
+      role: (json['role'] ?? '').toString(),
+      lastMessage: json['lastMessage']?.toString(),
+      lastMessageTime: json['lastMessageTime']?.toString(),
+      unreadCount: json['unreadCount'] != null ? (json['unreadCount'] as num).toInt() : 0,
     );
   }
 }

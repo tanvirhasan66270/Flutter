@@ -150,7 +150,6 @@ class _CommercialDashboardScreenState extends ConsumerState<CommercialDashboardS
               children: [
                 // ── 1. Top Header (Dynamic Navigation Bar) ─────────
                 DynamicScmTopNavBar(
-                  title: 'COMMERCIAL DASHBOARD',
                   onRefresh: () {
                     ref.invalidate(letterOfCreditListProvider);
                     ref.invalidate(invoiceListProvider);

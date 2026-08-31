@@ -221,13 +221,14 @@ class _QCInspectionFormScreenState extends ConsumerState<QCInspectionFormScreen>
                       // Step 1: Assigning Cargo Node Vector (GRN Link)
                       _buildNumberedLabel(1, 'ASSIGNING CARGO NODE VECTOR (GRN LINK) *', Icons.link),
                       DropdownButtonFormField<int>(
+                        isExpanded: true,
                         initialValue: grnId == 0 ? null : grnId,
                         decoration: _inputDecoration().copyWith(
                           hintText: '-- Select Internal GRN Code Reference --',
                         ),
                         items: grns.map((g) => DropdownMenuItem<int>(
                           value: g.id,
-                          child: Text('GRN: ${g.grnNumber} (PO: ${g.poNumber})', style: const TextStyle(fontSize: 12)),
+                          child: Text('GRN: ${g.grnNumber} (PO: ${g.poNumber})', style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                         )).toList(),
                         onChanged: isEdit
                             ? null
@@ -242,13 +243,14 @@ class _QCInspectionFormScreenState extends ConsumerState<QCInspectionFormScreen>
                       // Step 2: Target Consignment Product
                       _buildNumberedLabel(2, 'TARGET CONSIGNMENT PRODUCT *', Icons.inventory_2_outlined),
                       DropdownButtonFormField<int>(
+                        isExpanded: true,
                         initialValue: (productId != 0 && filteredProducts.any((p) => p.id == productId)) ? productId : null,
                         decoration: _inputDecoration().copyWith(
                           hintText: '-- Select Core Target Product --',
                         ),
                         items: filteredProducts.map((p) => DropdownMenuItem<int>(
                           value: p.id,
-                          child: Text(p.name, style: const TextStyle(fontSize: 12)),
+                          child: Text(p.name, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
                         )).toList(),
                         onChanged: isEdit ? null : (val) => setState(() => productId = val ?? 0),
                       ),
@@ -257,13 +259,14 @@ class _QCInspectionFormScreenState extends ConsumerState<QCInspectionFormScreen>
                       // Step 3: Inspection Topology
                       _buildNumberedLabel(3, 'INSPECTION TOPOLOGY *', Icons.filter_alt_outlined),
                       DropdownButtonFormField<String>(
+                        isExpanded: true,
                         initialValue: inspectionType,
                         decoration: _inputDecoration(),
                         items: const [
-                          DropdownMenuItem(value: 'VISUAL', child: Text('VISUAL EXAMINATION', style: TextStyle(fontSize: 12))),
-                          DropdownMenuItem(value: 'LAB_TEST', child: Text('CHEMICAL LAB TEST', style: TextStyle(fontSize: 12))),
-                          DropdownMenuItem(value: 'FUNCTIONAL', child: Text('FUNCTIONAL AUDIT', style: TextStyle(fontSize: 12))),
-                          DropdownMenuItem(value: 'DIMENSIONAL', child: Text('DIMENSIONAL METRIC', style: TextStyle(fontSize: 12))),
+                          DropdownMenuItem(value: 'VISUAL', child: Text('VISUAL EXAMINATION', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'LAB_TEST', child: Text('CHEMICAL LAB TEST', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'FUNCTIONAL', child: Text('FUNCTIONAL AUDIT', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'DIMENSIONAL', child: Text('DIMENSIONAL METRIC', style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
                         ],
                         onChanged: (val) => setState(() => inspectionType = val ?? 'VISUAL'),
                       ),
@@ -298,13 +301,14 @@ class _QCInspectionFormScreenState extends ConsumerState<QCInspectionFormScreen>
                       // Step 6: Audit Evaluation Grade
                       _buildNumberedLabel(6, 'AUDIT EVALUATION GRADE *', Icons.workspace_premium_outlined),
                       DropdownButtonFormField<String>(
+                        isExpanded: true,
                         initialValue: result,
                         decoration: _inputDecoration(),
                         items: const [
-                          DropdownMenuItem(value: 'VERY_GOOD', child: Text('🌟 VERY GOOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
-                          DropdownMenuItem(value: 'GOOD', child: Text('✅ GOOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.success))),
-                          DropdownMenuItem(value: 'AVERAGE', child: Text('⚠️ AVERAGE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.warning))),
-                          DropdownMenuItem(value: 'BAD', child: Text('❌ BAD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.danger))),
+                          DropdownMenuItem(value: 'VERY_GOOD', child: Text('🌟 VERY GOOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'GOOD', child: Text('✅ GOOD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.success), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'AVERAGE', child: Text('⚠️ AVERAGE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.warning), overflow: TextOverflow.ellipsis)),
+                          DropdownMenuItem(value: 'BAD', child: Text('❌ BAD', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.danger), overflow: TextOverflow.ellipsis)),
                         ],
                         onChanged: (val) => setState(() => result = val ?? 'GOOD'),
                       ),

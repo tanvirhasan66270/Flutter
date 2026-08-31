@@ -16,6 +16,8 @@ final salesOfficerListProvider = FutureProvider.autoDispose<List<SalesOfficerRes
 final currentSalesOfficerProvider = FutureProvider.autoDispose<SalesOfficerResponseDTO?>((ref) async {
   final user = ref.watch(currentUserProvider);
   if (user == null) return null;
+  final role = user.role.toUpperCase();
+  if (!role.contains('SALES')) return null;
   try {
     return await ref.watch(salesOfficerRepositoryProvider).findByUserId(user.userId);
   } catch (_) {

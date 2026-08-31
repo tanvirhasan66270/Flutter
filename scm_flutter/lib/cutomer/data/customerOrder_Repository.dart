@@ -40,20 +40,28 @@ class CustomerOrderRepository {
 
   /// 3. Get All Orders / Customer Specific Orders (GET /api/customerOrders)
   Future<List<CustomerOrderResponse>> findAll() async {
-    final res = await _dio.get(ApiConstants.customerOrders);
-    if (res.statusCode == 204 || res.data == null) return [];
-    return (res.data as List)
-        .map((e) => CustomerOrderResponse.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final res = await _dio.get(ApiConstants.customerOrders);
+      if (res.statusCode == 204 || res.data == null || res.data is! List) return [];
+      return (res.data as List)
+          .map((e) => CustomerOrderResponse.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   /// 4. Get By Customer Email/Username (GET /api/customerOrders/customer)
   Future<List<CustomerOrderResponse>> getByCustomerEmail() async {
-    final res = await _dio.get(ApiConstants.customerOrdersByEmail);
-    if (res.statusCode == 204 || res.data == null) return [];
-    return (res.data as List)
-        .map((e) => CustomerOrderResponse.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final res = await _dio.get(ApiConstants.customerOrdersByEmail);
+      if (res.statusCode == 204 || res.data == null || res.data is! List) return [];
+      return (res.data as List)
+          .map((e) => CustomerOrderResponse.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   /// 5. Find Single Order Context By ID (GET /api/customerOrders/{id})

@@ -13,10 +13,11 @@ class InvoiceRepository {
   Future<List<InvoiceResponseModel>> findAll() async {
     try {
       final response = await _dio.get(ApiConstants.invoices);
-      final List data = response.data ?? [];
+      if (response.statusCode == 204 || response.data == null || response.data is! List) return [];
+      final List data = response.data as List;
       return data.map((e) => InvoiceResponseModel.fromJson(e)).toList();
-    } catch (e) {
-      throw Exception('Failed to load invoices: $e');
+    } catch (_) {
+      return [];
     }
   }
 

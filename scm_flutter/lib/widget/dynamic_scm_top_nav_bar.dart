@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scm_flutter/auth/authProvider.dart';
+import 'package:scm_flutter/cutomer/provider/customer_provider.dart';
 import 'package:scm_flutter/sales_officer/provider/sales_officer_provider.dart';
 import 'package:scm_flutter/suppplier/provider/supplier_provider.dart';
+import 'package:scm_flutter/system/massage/chat_workspace_screen.dart';
 import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
 import 'package:scm_flutter/util/apiConstants.dart';
@@ -35,7 +37,9 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
     if (cleanPath.startsWith('sales_officer/') ||
         cleanPath.startsWith('supplier/') ||
         cleanPath.startsWith('product/') ||
-        cleanPath.startsWith('customer/')) {
+        cleanPath.startsWith('customer/') ||
+        cleanPath.startsWith('driver/') ||
+        cleanPath.startsWith('user/')) {
       return '${ApiConstants.imgUrl}$cleanPath';
     }
     return '${ApiConstants.imgUrl}$subFolder/$cleanPath';
@@ -49,19 +53,70 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
         ? rawName.substring(0, 2).toUpperCase()
         : (rawName.isNotEmpty ? rawName.toUpperCase() : 'US');
 
-    // Resolve avatar image from sales officer, supplier directory, or user profile
+    // Resolve avatar image across User profile, Sales Officer, Customer, and Supplier providers
     String avatarUrl = '';
-    final salesOfficerAsync = ref.watch(currentSalesOfficerProvider);
-    final currentSalesOfficer = salesOfficerAsync.value;
-    if (currentSalesOfficer != null && currentSalesOfficer.image.isNotEmpty) {
-      avatarUrl = _resolveImageUrl(currentSalesOfficer.image, subFolder: 'sales_officer');
-    } else {
+    
+    // 1. Direct image on User model
+    if (currentUser?.image != null && currentUser!.image!.trim().isNotEmpty) {
+      avatarUrl = _resolveImageUrl(currentUser.image, subFolder: 'user');
+    }
+
+    // 2. Sales Officer image
+    if (avatarUrl.isEmpty) {
+      final salesOfficerAsync = ref.watch(currentSalesOfficerProvider);
+      final currentSalesOfficer = salesOfficerAsync.value;
+      if (currentSalesOfficer != null && currentSalesOfficer.image.isNotEmpty) {
+        avatarUrl = _resolveImageUrl(currentSalesOfficer.image, subFolder: 'sales_officer');
+      }
+    }
+
+    // 3. Customer image
+    if (avatarUrl.isEmpty) {
+      final customerAsync = ref.watch(currentCustomerProvider);
+      final currentCustomer = customerAsync.value;
+      if (currentCustomer != null && currentCustomer.image.isNotEmpty) {
+        avatarUrl = _resolveImageUrl(currentCustomer.image, subFolder: 'customer');
+      }
+    }
+
+    // 4. Supplier image
+    if (avatarUrl.isEmpty) {
       final suppliersAsync = ref.watch(supplierListProvider);
       final suppliers = suppliersAsync.value ?? [];
       final currentSupplier = suppliers.where((s) => s.userId == currentUser?.userId).firstOrNull;
       if (currentSupplier != null && currentSupplier.image.isNotEmpty) {
         avatarUrl = _resolveImageUrl(currentSupplier.image, subFolder: 'supplier');
       }
+    }
+
+    final role = currentUser?.role.toUpperCase() ?? '';
+    String displayTitle = title;
+    IconData roleIcon = Icons.business_center;
+
+    if (role.contains('CUSTOMER')) {
+      roleIcon = Icons.shopping_bag_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'SCM Customer Portal';
+    } else if (role.contains('DRIVER')) {
+      roleIcon = Icons.local_shipping_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Driver Logistics Console';
+    } else if (role.contains('LOGISTICS')) {
+      roleIcon = Icons.inventory_2_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Logistics Officer Hub';
+    } else if (role.contains('PROCUREMENT')) {
+      roleIcon = Icons.shopping_cart_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Procurement Hub';
+    } else if (role.contains('COMMERCIAL')) {
+      roleIcon = Icons.receipt_long_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Commercial Portal';
+    } else if (role.contains('SALES')) {
+      roleIcon = Icons.point_of_sale_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Sales Officer Console';
+    } else if (role.contains('QC') || role.contains('INSPECTOR')) {
+      roleIcon = Icons.fact_check_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Quality Inspector Portal';
+    } else if (role.contains('SUPPLIER')) {
+      roleIcon = Icons.storefront_outlined;
+      if (title == 'SCM ENTERPRISE' || title.isEmpty) displayTitle = 'Supplier Enterprise Portal';
     }
 
     return Container(
@@ -91,12 +146,12 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                       color: const Color(0xFF2563EB).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.business_center, color: Color(0xFF2563EB), size: 18),
+                    child: Icon(roleIcon, color: const Color(0xFF2563EB), size: 18),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      title,
+                      displayTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
@@ -113,6 +168,19 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
               mainAxisSize: MainAxisSize.min,
               children: [
                 const DynamicNotificationButton(),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.chat_outlined, color: AppTheme.secondary, size: 20),
+                  tooltip: 'Messages & Chat',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ChatWorkspaceScreen()),
+                    );
+                  },
+                ),
                 const SizedBox(width: 4),
                 
                 // User Avatar Circle (Displays Profile & Logout Popup on click)
@@ -232,14 +300,52 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                   constraints: const BoxConstraints(minWidth: 220),
                   onSelected: (value) async {
                     switch (value) {
+                      case 'purchase_requisition':
+                        Navigator.pushNamed(context, '/purchase-requisitions');
+                        break;
+                      case 'purchase_order':
+                        Navigator.pushNamed(context, '/purchase-orders');
+                        break;
+                      case 'quotation':
+                        Navigator.pushNamed(context, '/quotations');
+                        break;
+                      case 'product_requirements':
+                        Navigator.pushNamed(context, '/purchase-requisitions');
+                        break;
+                      case 'add_category':
+                        Navigator.pushNamed(context, '/category-data');
+                        break;
+                      case 'products':
+                        Navigator.pushNamed(context, '/products');
+                        break;
+                      case 'customer_requirements':
                       case 'customer_orders':
                         Navigator.pushNamed(context, '/customer-orders');
                         break;
                       case 'payment_statement':
-                        Navigator.pushNamed(context, '/payment-statement');
+                        Navigator.pushNamed(context, '/add-payment');
+                        break;
+                      case 'warehouse':
+                      case 'stock':
+                        Navigator.pushNamed(context, '/inventory-data');
+                        break;
+                      case 'stock_movement':
+                        Navigator.pushNamed(context, '/stock-movements');
+                        break;
+                      case 'grn':
+                        Navigator.pushNamed(context, '/good-received-notes');
+                        break;
+                      case 'qc_inspections':
+                        Navigator.pushNamed(context, '/qc-inspections');
                         break;
                       case 'shipment':
                         Navigator.pushNamed(context, '/shipments');
+                        break;
+                      case 'delivery_trip':
+                        Navigator.pushNamed(context, '/delivery-trips');
+                        break;
+                      case 'vehicles':
+                        Navigator.pushNamed(context, '/vehicles');
                         break;
                       case 'letter_of_credit':
                         Navigator.pushNamed(context, '/letter-of-credit-data');
@@ -248,16 +354,22 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                         Navigator.pushNamed(context, '/lc-bank-data');
                         break;
                       case 'billing':
-                        Navigator.pushNamed(context, '/billing');
+                        Navigator.pushNamed(context, '/commercial-invoice-data');
                         break;
                       case 'po_line_item':
                         Navigator.pushNamed(context, '/po-line-items');
+                        break;
+                      case 'daily_report':
+                        Navigator.pushNamed(context, '/customer-orders');
+                        break;
+                      case 'activity_log':
+                        Navigator.pushNamed(context, '/notifications');
                         break;
                       case 'profile':
                         final role = currentUser?.role.toUpperCase() ?? '';
                         if (role.contains('SALES')) {
                           Navigator.pushNamed(context, '/sales-officer-profile');
-                        } else if (role.contains('PROCUREMENT') || role.contains('LOGISTICS')) {
+                        } else if (role.contains('PROCUREMENT') || role.contains('LOGISTICS') || role.contains('MANAGER') || role.contains('ADMIN')) {
                           Navigator.pushNamed(context, '/procurement-profile');
                         } else if (role.contains('DRIVER')) {
                           Navigator.pushNamed(context, '/driver-profile');
@@ -292,10 +404,8 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                   },
                   itemBuilder: (BuildContext context) {
                     final userRole = currentUser?.role.toUpperCase() ?? '';
-                    final isCommercial = userRole == 'COMMERCIAL_OFFICER' ||
-                        userRole == 'ROLE_COMMERCIAL_OFFICER' ||
-                        userRole == 'COMMERCIAL' ||
-                        userRole.contains('COMMERCIAL');
+                    final isManagerOrAdmin = userRole.contains('MANAGER') || userRole.contains('ADMIN');
+                    final isCommercial = userRole.contains('COMMERCIAL');
 
                     const profileItem = PopupMenuItem<String>(
                       value: 'profile',
@@ -320,6 +430,344 @@ class DynamicScmTopNavBar extends ConsumerWidget implements PreferredSizeWidget 
                         ],
                       ),
                     );
+
+                    // If Manager or Admin, show full dropdown menu matching user images
+                    if (isManagerOrAdmin) {
+                      return [
+                        // PROCUREMENT
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('PROCUREMENT', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'purchase_requisition',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.description_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Purchase Requisition', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'purchase_order',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.shopping_cart_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Purchase Order', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'quotation',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.request_quote_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Quotations', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'product_requirements',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.inventory_2_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Product Requirements', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        // PRODUCTS & ORDERS
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('PRODUCTS & ORDERS', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'add_category',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.label_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Add Category', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'products',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.grid_view_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Products', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'customer_requirements',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.assignment_ind_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Customer Requirements', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'customer_orders',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.shopping_bag_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Customer Orders', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'payment_statement',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.account_balance_wallet_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Payment Statement', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        // INVENTORY
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('INVENTORY', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'warehouse',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.storefront_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Warehouse', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'stock',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.layers_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Stock', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'stock_movement',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.swap_horiz_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Stock Movement', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'grn',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.move_to_inbox_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Goods Received Note', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        // QUALITY CONTROL
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('QUALITY CONTROL', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'qc_inspections',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.fact_check_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Quality Inspections', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        // LOGISTICS
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('LOGISTICS', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'shipment',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.local_shipping_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Shipment', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'delivery_trip',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.alt_route_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Delivery Trip', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'vehicles',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.directions_bus_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Vehicles', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        // COMMERCIAL
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('COMMERCIAL', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'letter_of_credit',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.account_balance_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Letter Of Credit', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'lc_bank',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.account_balance_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('LC Bank', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'billing',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.receipt_long_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Billing', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'po_line_item',
+                          height: 34,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Row(
+                                children: [
+                                  Icon(Icons.format_list_bulleted, size: 15, color: Colors.black87),
+                                  SizedBox(width: 10),
+                                  Text('PO Line Item', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade50,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.green.shade400, width: 0.8),
+                                ),
+                                child: const Text('Active', style: TextStyle(fontSize: 8.5, color: Colors.green, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        // REPORTS & LOGS
+                        const PopupMenuItem<String>(
+                          enabled: false,
+                          height: 24,
+                          child: Text('REPORTS & LOGS', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.blueGrey, letterSpacing: 0.5)),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'daily_report',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.insert_chart_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Daily Report', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'activity_log',
+                          height: 34,
+                          child: Row(
+                            children: [
+                              Icon(Icons.list_alt_outlined, size: 15, color: Colors.black87),
+                              SizedBox(width: 10),
+                              Text('Activity Log', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+
+                        const PopupMenuDivider(height: 8),
+
+                        profileItem,
+                        logoutItem,
+                      ];
+                    }
 
                     if (!isCommercial) {
                       return [profileItem, logoutItem];

@@ -25,12 +25,14 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _streetAddressController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nidController = TextEditingController();
 
   String _gender = 'MALE';
   int? _policeStationId;
+  LocationSelection? _currentLocation;
   File? _selectedImage;
   Uint8List? _selectedImageBytes;
   String? _selectedImageName;
@@ -48,10 +50,37 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _streetAddressController.dispose();
     _addressController.dispose();
     _dobController.dispose();
     _nidController.dispose();
     super.dispose();
+  }
+
+  void _updateFullAddress() {
+    final parts = <String>[];
+    final street = _streetAddressController.text.trim();
+    if (street.isNotEmpty) parts.add(street);
+
+    if (_currentLocation != null) {
+      if (_currentLocation!.policeStationName != null && _currentLocation!.policeStationName!.isNotEmpty) {
+        parts.add(_currentLocation!.policeStationName!);
+      }
+      if (_currentLocation!.districtName != null && _currentLocation!.districtName!.isNotEmpty) {
+        parts.add(_currentLocation!.districtName!);
+      }
+      if (_currentLocation!.divisionName != null && _currentLocation!.divisionName!.isNotEmpty) {
+        parts.add(_currentLocation!.divisionName!);
+      }
+      if (_currentLocation!.countryName != null && _currentLocation!.countryName!.isNotEmpty) {
+        parts.add(_currentLocation!.countryName!);
+      }
+    }
+
+    final generatedAddress = parts.join(', ');
+    setState(() {
+      _addressController.text = generatedAddress;
+    });
   }
 
   Future<void> _pickImage() async {
@@ -481,7 +510,7 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
 
                     // Section 3: Location Cascade & Shipping Address
                     _buildSectionCard(
-                      title: '3. LOCATION ROUTE & SHIPPING ADDRESS',
+                      title: '3. REGIONAL MATRIX BASE & FULL ADDRESS',
                       icon: Icons.location_on_outlined,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -504,20 +533,65 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
                               onChanged: (selection) {
                                 setState(() {
                                   _policeStationId = selection.policeStationId;
+                                  _currentLocation = selection;
+                                  _updateFullAddress();
                                 });
                               },
                             ),
                           ),
                           const SizedBox(height: 14),
 
-                          // Detailed Physical Address
+                          // Local Street Address Vector Input
                           _buildTextField(
-                            controller: _addressController,
-                            label: 'Detailed Physical Shipping Street Address *',
-                            hint: 'House #, Road #, Area, Block/Sector...',
+                            controller: _streetAddressController,
+                            label: 'Local Street Vector / House / Road *',
+                            hint: 'e.g. House #12, Road #4, Sector 7',
                             icon: Icons.home_outlined,
-                            maxLines: 2,
-                            validator: (v) => (v == null || v.trim().isEmpty) ? 'Shipping address is required' : null,
+                            onChanged: (_) => _updateFullAddress(),
+                            validator: (v) => (v == null || v.trim().isEmpty) ? 'Street address is required' : null,
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Auto-Generated Full Address Field & Live Manifest Box
+                          const Text(
+                            'Aggregated Manifest Full Address (Auto-Filled) *',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppTheme.blueLight,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: const [
+                                    Icon(Icons.location_city_outlined, size: 16, color: AppTheme.primary),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'AUTO-GENERATED FULL ADDRESS MANIFEST',
+                                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _addressController.text.isNotEmpty
+                                      ? _addressController.text
+                                      : 'Awaiting location cascade & street address input...',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: _addressController.text.isNotEmpty ? AppTheme.dark : AppTheme.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -607,6 +681,7 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
     bool readOnly = false,
     int maxLines = 1,
     VoidCallback? onTap,
+    ValueChanged<String>? onChanged,
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
@@ -617,6 +692,7 @@ class _CustomerRegisterScreenState extends ConsumerState<CustomerRegisterScreen>
       readOnly: readOnly,
       maxLines: maxLines,
       onTap: onTap,
+      onChanged: onChanged,
       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.dark),
       decoration: InputDecoration(
         labelText: label,

@@ -77,7 +77,7 @@ class CustomerRepository {
 
     return FormData.fromMap({
       'customer': jsonEncode(customer.toJson()),
-      if (imageFile != null) 'image': imageFile,
+      'image': ?imageFile,
     });
   }
 }

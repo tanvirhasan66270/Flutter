@@ -16,8 +16,8 @@ import 'package:scm_flutter/logistics_officer/screen/delivery_trip_data_screen.d
 import 'package:scm_flutter/logistics_officer/screen/vehicle_data_screen.dart';
 import 'package:scm_flutter/qc_inspactor/screen/qc_inspection_data_screen.dart';
 import 'package:scm_flutter/suppplier/provider/shipment_provider.dart';
-import 'package:scm_flutter/system/notification/notification_icon_button.dart';
 import 'package:scm_flutter/them/allAppThim.dart';
+import 'package:scm_flutter/widget/dynamic_scm_top_nav_bar.dart';
 
 extension ShipmentStatusExt on ShipmentResponseModel {
   String get status {
@@ -118,14 +118,14 @@ class _LogisticsOfficerDashboardScreenState extends ConsumerState<LogisticsOffic
       shipmentsTrend = 100;
     }
 
-    final lowStockItems = inventory.where((i) => i.quantityReserved <= 5 || i.quantityOnHand <= 10).toList();
+    final lowStockItems = inventory.where((i) => ((i.quantityReserved as num?) ?? 0) <= 5 || ((i.quantityOnHand as num?) ?? 0) <= 10).toList();
     final lowStockCount = lowStockItems.length;
 
     final totalVehicles = vehicles.length;
     final availableVehicles = vehicles.where((v) => v.status == 'AVAILABLE').length;
 
-    final totalInventoryCount = inventory.fold<int>(0, (sum, i) => sum + i.quantityOnHand);
-    final totalAvailableQty = inventory.fold<int>(0, (sum, i) => sum + i.availableQuantity);
+    final totalInventoryCount = inventory.fold<int>(0, (sum, i) => sum + (((i.quantityOnHand as num?) ?? 0).toInt()));
+    final totalAvailableQty = inventory.fold<int>(0, (sum, i) => sum + (((i.availableQuantity as num?) ?? 0).toInt()));
 
     // Movements Today Calculation
     int movementsTodayCount = 0;
@@ -168,7 +168,7 @@ class _LogisticsOfficerDashboardScreenState extends ConsumerState<LogisticsOffic
       int used = 0;
       for (final inv in inventory) {
         if (inv.warehouseId == wh.id) {
-          used += inv.quantityOnHand;
+          used += ((inv.quantityOnHand as num?) ?? 0).toInt();
         }
       }
       aggregateUsed += used;
@@ -197,7 +197,18 @@ class _LogisticsOfficerDashboardScreenState extends ConsumerState<LogisticsOffic
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ১. Top Bar
-                _buildTopBar(context, userName),
+                DynamicScmTopNavBar(
+                  onRefresh: () {
+                    ref.invalidate(shipmentListProvider);
+                    ref.invalidate(inventoryListProvider);
+                    ref.invalidate(vehicleListProvider);
+                    ref.invalidate(deliveryTripListProvider);
+                    ref.invalidate(warehouseListProvider);
+                    ref.invalidate(stockMovementListProvider);
+                    ref.invalidate(goodReceivedNoteListProvider);
+                    ref.invalidate(qcInspectionListProvider);
+                  },
+                ),
 
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -333,75 +344,7 @@ class _LogisticsOfficerDashboardScreenState extends ConsumerState<LogisticsOffic
     );
   }
 
-  // --- TOP BAR ---
-  Widget _buildTopBar(BuildContext context, String userName) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: AppTheme.surfaceWhite,
-        border: Border(bottom: BorderSide(color: AppTheme.borderGrey)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: AppTheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.local_shipping, color: AppTheme.primary, size: 22),
-              ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('SCM ENTERPRISE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.dark)),
-                  Text('Logistics Officer Dashboard', style: TextStyle(fontSize: 10, color: AppTheme.secondary)),
-                ],
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const DynamicNotificationButton(),
-              const SizedBox(width: 8),
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppTheme.primary,
-                child: Text(userName.isNotEmpty ? userName[0].toUpperCase() : 'L', style: const TextStyle(color: AppTheme.surfaceWhite, fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-              IconButton(
-                icon: const Icon(Icons.logout, color: AppTheme.danger, size: 20),
-                tooltip: 'Log Out',
-                onPressed: () => _confirmLogout(context),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out from Logistics Dashboard?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ref.read(authControllerProvider.notifier).logout();
-              Navigator.of(context).pushReplacementNamed('/login');
-            },
-            child: const Text('Log Out', style: TextStyle(color: AppTheme.danger)),
-          ),
-        ],
-      ),
-    );
-  }
 
   // --- WELCOME BANNER ---
   Widget _buildWelcomeBanner(String userName) {
@@ -844,14 +787,14 @@ class _LogisticsOfficerDashboardScreenState extends ConsumerState<LogisticsOffic
                 )
               : Column(
                   children: warehouses.take(2).map((wh) {
-                    final cap = (wh.capacity != null && wh.capacity > 0) ? wh.capacity as int : 1000;
+                    final cap = (wh.capacity != null && ((wh.capacity as num?) ?? 0) > 0) ? (wh.capacity as num).toInt() : 1000;
                     int used = 0;
                     for (final inv in inventory) {
                       if (inv.warehouseId == wh.id) {
-                        used += inv.quantityOnHand as int;
+                        used += ((inv.quantityOnHand as num?) ?? 0).toInt();
                       }
                     }
-                    final pct = ((used / cap) * 100).clamp(0, 100).round();
+                    final pct = cap > 0 ? ((used / cap) * 100).clamp(0, 100).round() : 0;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Column(
